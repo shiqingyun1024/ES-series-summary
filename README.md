@@ -20,3 +20,32 @@ const 关键字用来声明常量，const 声明有以下特点
 注意: 对象属性修改和数组元素变化不会出发 const 错误
 应用场景：声明对象类型使用 const，非对象类型声明选择 let
 、、、
+### 2.3.变量的解构赋值
+、、、
+ES6 允许按照一定模式，从数组和对象中提取值，对变量进行赋值，这被称为解构赋值。
+
+//数组的解构赋值
+const arr = ['张学友', '刘德华', '黎明', '郭富城'];
+let [zhang, liu, li, guo] = arr; 4
+
+//对象的解构赋值
+const lin = {
+name: '林志颖',
+tags: ['车手', '歌手', '小旋风', '演员']
+};
+let {name, tags} = lin;
+
+//复杂解构
+let wangfei = {
+name: '王菲',
+age: 18,
+songs: ['红豆', '流年', '暧昧', '传奇'],
+history: [
+{name: '窦唯'},
+{name: '李亚鹏'},
+{name: '谢霆锋'} ]
+};
+let {songs: [one, two, three], history: [first, second, third]} = 
+wangfei;
+注意：频繁使用对象方法、数组元素，就可以使用解构赋值形式
+、、、
