@@ -49,3 +49,20 @@ let {songs: [one, two, three], history: [first, second, third]} =
 wangfei;
 注意：频繁使用对象方法、数组元素，就可以使用解构赋值形式
 、、、
+### 2.4.模板字符串
+、、、
+模板字符串（template string）是增强版的字符串，用反引号（`）标识，特点：
+1) 字符串中可以出现换行符
+2) 可以使用 ${xxx} 形式输出变量
+// 定义字符串
+let str = `<ul>
+<li>沈腾</li>
+<li>玛丽</li>
+<li>魏翔</li>
+<li>艾伦</li>
+</ul>`;
+// 变量拼接
+let star = '王宁';
+let result = `${star}在前几年离开了开心麻花`;
+注意：当遇到字符串与变量拼接的情况使用模板字符串
+、、、
