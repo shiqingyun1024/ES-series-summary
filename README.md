@@ -66,3 +66,24 @@ let star = '王宁';
 let result = `${star}在前几年离开了开心麻花`;
 注意：当遇到字符串与变量拼接的情况使用模板字符串
 、、、
+
+### 2.5.简化对象写法
+、、、
+ES6 允许在大括号里面，直接写入变量和函数，作为对象的属性和方法。这
+样的书写更加简洁。
+let name = '尚硅谷';
+let slogon = '永远追求行业更高标准';
+let improve = function () {
+console.log('可以提高你的技能');
+}
+//属性和方法简写
+let atguigu = {
+name,
+slogon,
+improve,
+change() {
+console.log('可以改变你') }
+};
+6
+注意：对象简写形式简化了代码，所以以后用简写就对了
+、、、
