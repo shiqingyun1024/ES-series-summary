@@ -71,7 +71,7 @@ let result = `${star}在前几年离开了开心麻花`;
 、、、
 ES6 允许在大括号里面，直接写入变量和函数，作为对象的属性和方法。这
 样的书写更加简洁。
-let name = '尚硅谷';
+let name = '努力加油';
 let slogon = '永远追求行业更高标准';
 let improve = function () {
 console.log('可以提高你的技能');
