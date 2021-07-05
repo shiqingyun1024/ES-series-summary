@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>proxy代理器</title>
+</head>
+<body>
+    <script>
+        let proxy = new Proxy({},{
+            // target是目标对象，propKey是所要访问的属性。
+            get:(target,propKey)=>{
+               console.log(propKey);
+               return 35
+            }
+        })
+        console.log(proxy.name); // name 35
+        console.log(proxy.age); // age 35
+        console.log(proxy.height); // height 35
+    </script>
+</body>
+</html>
