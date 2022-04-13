@@ -107,8 +107,8 @@ fproxy.foo === "Hello,foo" // true
 对于可以设置、但没有设置拦截的操作，则直接落在目标对象上，按照原先的方式产生
 结果。
 下面是Proxy支持的拦截操作一览，一共13种。
-- get(target,propKey,receiver)：拦截对象属性的读取，比如
-  proxy.foo和proxy['foo']。
+- get(target,propKey,receiver)：（receiver为proxy实例本身）拦截对象属性的读取，
+  比如proxy.foo和proxy['foo']。
 - set(target,propKey,value,receiver)：拦截对象属性的设置，比如
   proxy.foo = v 或 proxy['foo'] = v，返回一个布尔值。
 - has(target,propKey)：拦截propKey in proxy的操作，返回一个布尔值。
@@ -136,4 +136,24 @@ Object.isExtensible() 方法判断一个对象是否是可扩展的（是否可�
 proxy(...args)、proxy.call(object, ...args)、proxy.apply(...)。
 - construct(target, args)：拦截 Proxy 实例作为构造函数调用的操作，
 比如new proxy(...args)。      
+```
+## 2、Proxy实例的方法
+```
+下面是上面这些拦截方法的详细介绍。
+get()
+get方法用于拦截某个属性的读取操作，可以接受三个参数，依次为目标对象、属性名
+和proxy实例本身（严格地说，是操作行为所针对的对象），其中最后一个参数可选。
+get方法的用法，上文已经有一个例子，下面是另外一个拦截读取操作的例子。
+var person = {
+    name:"张三"
+};
+var proxy = new Proxy(person,{
+    get:function(target,propKey) {
+        if(propKey in target) {
+            return target[propKey]
+        }else{
+            throw new ReferenceError(`Prop name"${propKey}"does not exist`)
+        }
+    }
+})
 ```
