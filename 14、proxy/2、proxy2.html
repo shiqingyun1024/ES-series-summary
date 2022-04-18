@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>proxy代理器</title>
+</head>
+
+<body>
+    <script>
+        function createArray(...elements) { // 主要是使用扩展运算符
+            let handler = {
+                get(target, propKey, receiver) {
+                    let index = Number(propKey);
+                    if (index < 0) {
+                        propKey = String(target.length + index);
+                    }
+                    return Reflect.get(target, propKey, receiver);
+                }
+            }
+            let target = [];
+            target.push(...elements); // 主要是使用扩展运算符
+            return new Proxy(target, handler);
+        }
+        let arr = createArray('a', 'b', 'c');
+        arr[-1]  // c
+        console.log(arr[-1]);
+    </script>
+</body>
+
+</html>

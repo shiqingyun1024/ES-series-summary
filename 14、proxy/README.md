@@ -175,5 +175,22 @@ obj.foo // "GET foo"
 拦截会生效。
 
 下面的例子使用get拦截，实现数组读取负数的索引。
+function createArray(...elements){ // 主要是使用扩展运算符
+   let handler = {
+       get(target,propKey,receiver) {
+           let index = Number(propKey);
+           if(index < 0){
+               propKey = String(target.length + index);
+           }
+           return Reflect.get(target,propKey,receiver);
+       }
+   }
+   let target = [];
+   target.push(...elements); // 主要是使用扩展运算符
+   return new Proxy(target,handler);
+}
+let arr = createArray('a','b','c');
+arr[-1]  // c
+上面代码中，数组的位置参数是-1，就会输出数组的倒数第一个成员。
 
 ```
