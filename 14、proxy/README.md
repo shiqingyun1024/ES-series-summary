@@ -194,12 +194,14 @@ arr[-1]  // c
 上面代码中，数组的位置参数是-1，就会输出数组的倒数第一个成员。
 
 利用Proxy，可以将读取属性的操作（get），转变为执行某个函数，从而实现属性的链式操作。
-var pipe = function （）{
+var pipe = function （value）{
     var funcStack = [];
     var oproxy = new Proxy({},{
         get:function(pipeObject,fnName){
            if(fnName === 'get' ){
-               return funcStack.reduce(function(val,fn){ // 使用数组的reduce方法
+               // 使用数组的reduce方法，注意reduce的用法，array.reduce(function(累计值,数组的中当前值,数组的中当前索引,原数组、/// array){
+               // },初始值)
+               return funcStack.reduce(function(val,fn){ 
                    return fn(val);
                },value);
            }
