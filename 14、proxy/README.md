@@ -217,4 +217,14 @@ var reverseInt = n => n.toString().split("").reverse().join("")|0;
 
 pipe(3).double.pow.reverseInt.get; // 63
 
+上面代码设置Proxy以后，达到了将函数名链式使用的效果。
+
+下面的例子则是利用get拦截，实现一个生成各种DOM节点的通用函数dom。
+const dom = new Proxy({},{
+    get(target,property){
+        return function(attrs={},...children){
+            
+        }
+    }
+})
 ```
