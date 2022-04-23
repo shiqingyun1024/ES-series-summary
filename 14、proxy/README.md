@@ -107,7 +107,7 @@ fproxy.foo === "Hello,foo" // true
 对于可以设置、但没有设置拦截的操作，则直接落在目标对象上，按照原先的方式产生
 结果。
 下面是Proxy支持的拦截操作一览，一共13种。
-- get(target,propKey,receiver)：（receiver为proxy实例本身）拦截对象属性的读取，
+- get(target,propKey,receiver)：（target是原对象，receiver为原对象的proxy实例本身）拦截对象属性的读取，
   比如proxy.foo和proxy['foo']。
 - set(target,propKey,value,receiver)：拦截对象属性的设置，比如
   proxy.foo = v 或 proxy['foo'] = v，返回一个布尔值。
@@ -223,8 +223,64 @@ pipe(3).double.pow.reverseInt.get; // 63
 const dom = new Proxy({},{
     get(target,property){
         return function(attrs={},...children){
-            
+            const el = document.createElement(property);
+            for(let prop of Object.keys(attrs)){
+                el.setAttribute(prop,attrs[prop]);
+            }
+            for(let child of children) {
+                if(typeof child === 'string'){
+                    child = document.createTextNode(child);
+                }
+                el.appendChild(child);
+            }
+            return el;
         }
     }
+});
+const el = dom.div({},
+   'Hello, my name is ',
+   dom.a({href: // example.com'},'mark'},
+    ,. I like:',
+    dom.ul({},
+      dom.li({},'The web'),
+      dom.li({},'Food'),
+      dom.li({},'...actually that\'s it'),
+    )
+   })
+)
+document.body.appendChild(el);
+下面是一个get方法的第三个参数的例子，它总是指向原始的读操作所在的那个对象，一般情况下就是Proxy实例。
+const proxy = new Proxy({},{
+    get:function(target,key,receiver) {
+        return receiver;
+    }
 })
+proxy.getReceiver === proxy // true
+上面代码中，proxy对象的getReceiver属性是由proxy对象提供的，所以receiver指向proxy对象。
+const proxy = new Proxy({},{
+    get:function(target,key,receiver){
+        return receiver;
+    }
+});
+const d = Object.create(proxy);
+d.a === d // true
+上面代码中，d对象本身没有a属性，所以读取d.a的时候，会去d的原型proxy对象找，
+这时，receiver就指向d，代表原始的读操作所在的那个对象。
+如果一个属性不可配置（configurable）且不可写（writable）,则Proxy不能修改
+该属性，否则通过Proxy对象访问该属性会报错。
+const target = Object.defineProperties({},{
+    foo:{
+        value:123,
+        writable:false,
+        configurable:false
+    }
+});
+const handler = {
+    get(target,propKey){
+        return 'abc'
+    }
+}
+const proxy = new Proxy(target,handler);
+proxy.foo
+// TypeError: Invariant check failed
 ```
