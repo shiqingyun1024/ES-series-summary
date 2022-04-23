@@ -138,6 +138,7 @@ proxy(...args)、proxy.call(object, ...args)、proxy.apply(...)。
 比如new proxy(...args)。      
 ```
 ## 2、Proxy实例的方法
+### get()
 ```
 下面是上面这些拦截方法的详细介绍。
 get()
@@ -283,4 +284,32 @@ const handler = {
 const proxy = new Proxy(target,handler);
 proxy.foo
 // TypeError: Invariant check failed
+```
+### set()
+```
+set方法用来拦截某个属性的赋值操作，可以接受四个参数，依次为目标对象、属性
+名、属性值和Proxy实例本身，其中最后一个参数可选。
+假定Person对象有一个age属性，该属性应该是一个不大于200的整数，那么可以
+使用Proxy保证age的属性值符合要求。
+let validator = {
+    set:function(obj,prop,value){
+        if(prop === 'age'){
+            if(!Number.isInteger(value)){
+                throw new TypeError('The age is not an integer');
+            }
+            if(value > 200){
+                throw new TypeError('The age seems invalid');
+            }
+        }
+
+        // 对于满足条件的age属性以及其他属性，直接保存
+        obj[prop] = value;
+        return true;
+    }
+}
+let person = new Proxy({},validator);
+person.age = 100;
+person.age // 100
+person.age = 'young' // 报错
+person.age = 300; // 报错
 ```
