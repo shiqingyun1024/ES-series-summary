@@ -12,19 +12,22 @@
     <script>
         const handler = {
             set: function (obj, prop, value, receiver) {
-                console.log(obj);
-                console.log(receiver);
-                console.log(obj === receiver);
+                console.log(obj); // myObj添加属性之后的值
+                console.log(receiver);// myObj添加属性之前的值，最开始的那个值
+                console.log(obj === receiver); // false
                 obj[prop] = receiver;
                 return true;
             }
         }
         const proxy = new Proxy({}, handler);
         const myObj = {};
-        Object.setPrototypeOf(myObj, proxy);
+        Object.setPrototypeOf(myObj, proxy); // 给myObj设置原型对象proxy
 
         myObj.foo = 'bar'
-        console.log(myObj.foo === myObj);
+        console.log(myObj.foo === myObj); // true
+        myObj.foo2 = 'bar2'
+        console.log(myObj);
+        console.log(myObj.foo2 === myObj); // true
         // myObj.foo === myObj // true 
     </script>
 </body>

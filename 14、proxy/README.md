@@ -366,4 +366,9 @@ Object.setPrototypeOf(myObj,proxy);
 
 myObj.foo = 'bar'
 myObj.foo === myObj // true 
+
+上面代码中，设置myObj.foo属性的值时，myObj并没有foo属性，因此引擎会到
+myObj的原型链去找foo属性。myObj的原型对象proxy是一个Proxy实例，设置它
+的foo属性会触发set方法。这时，第四个参数receiver就指向原始赋值行为所在的
+对象myObj。
 ```
