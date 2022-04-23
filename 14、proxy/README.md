@@ -371,4 +371,39 @@ myObj.foo === myObj // true
 myObj的原型链去找foo属性。myObj的原型对象proxy是一个Proxy实例，设置它
 的foo属性会触发set方法。这时，第四个参数receiver就指向原始赋值行为所在的
 对象myObj。
+
+注意，如果目标对象自身的某个属性不可写，那么set方法将不起作用。
+const obj = {};
+Object.defineProperty(obj,'foo',{
+    value:'bar',
+    writable:false
+});
+const handler = {
+    set:function(obj,prop,value,receiver){
+        obj[prop] = ’baz‘;
+        return true;
+    }
+}
+const proxy = new Proxy(obj,handler);
+proxy.foo = 'baz';
+proxy.foo // 'bar'
+上面代码中，obj.foo属性不可写，Proxy对这个属性的set代理将不会生效。
+
+注意，set代理应当返回一个布尔值。严格模式下，set代理如果没有返回true，
+就会报错。
+'use strict';
+const handler = {
+  set: function(obj, prop, value, receiver) {
+    obj[prop] = receiver;
+    // 无论有没有下面这一行，都会报错，应该返回true
+    return false;
+  }
+};
+const proxy = new Proxy({}, handler);
+proxy.foo = 'bar';
+// TypeError: 'set' on proxy: trap returned falsish for property 'foo'
+上面代码中，严格模式下，set代理返回false或者undefined，都会报错。
+```
+## apply()
+```
 ```
