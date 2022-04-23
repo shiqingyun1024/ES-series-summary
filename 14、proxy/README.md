@@ -342,4 +342,28 @@ proxy._prop = 'c' // Error: Invalid attempt to set private "_prop" propperty
 
 上面代码中，只要读写的属性名的第一个字符是下划线，一律抛错，从而达到禁止读写内部属性的目的。
 
+下面是set方法第四个参数的例子
+const handler = {
+    set:function(obj,prop,value,receiver){
+        obj[prop] = receiver;
+        return true;
+    }
+}
+const proxy = new Proxy({},handler);
+proxy.foo = 'bar';
+proxy.foo = proxy // true
+上面代码中，set方法的第四个参数receiver，指的是原始的操作行为所在
+的那个对象，一般情况下是proxy实例本身，请看下面的例子。
+const handler = {
+    set:function(obj,prop,value,receiver){
+       obj[prop] = receiver;
+       return true;
+    }
+}
+const proxy = new Proxy({},handler);
+const myObj = {};
+Object.setPrototypeOf(myObj,proxy);
+
+myObj.foo = 'bar'
+myObj.foo === myObj // true 
 ```

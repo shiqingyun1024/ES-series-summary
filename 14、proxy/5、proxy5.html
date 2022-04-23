@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxy中的set</title>
+</head>
+
+<body>
+    <script>
+        const handler = {
+            set: function (obj, prop, value, receiver) {
+                console.log(obj);
+                console.log(receiver);
+                console.log(obj === receiver);
+                obj[prop] = receiver;
+                return true;
+            }
+        }
+        const proxy = new Proxy({}, handler);
+        const myObj = {};
+        Object.setPrototypeOf(myObj, proxy);
+
+        myObj.foo = 'bar'
+        console.log(myObj.foo === myObj);
+        // myObj.foo === myObj // true 
+    </script>
+</body>
+
+</html>
