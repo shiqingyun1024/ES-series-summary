@@ -448,4 +448,41 @@ Reflect.apply(proxy,null,[9,10]) // 38
 ```
 ## has()
 ```
+has()方法用来拦截HasProperty操作，即判断对象是否具有某个属性时，这个方法
+会生效。典型的操作就是in运算符。
+has()方法可以接受两个参数，分别是目标对象、需查询的属性名。
+下面的例子使用has()方法隐藏某些属性，不被in运算符发现。
+var handler = {
+    has(target,key){
+        if(key[0] === '_'){
+            return false;
+        }
+        return key in target;
+    }
+}
+var target = {
+    _prop:'foo',
+    prop:'foo'
+};
+var proxy = new Proxy(target,handler);
+'_prop' in proxy // false
+上面代码中，如果原对象的属性名的第一个字符是下划线，proxy.has()就会返回
+false，从而不会被in运算符发现。
+如果原对象不可配置或者禁止扩展，这时has()拦截会报错。
+var obj = { a: 10};
+Object.preventExtensions(obj);
+var p = new Proxy(obj,{
+    has:function(target,prop){
+       return false;
+    }
+});
+'a' in p  // TypeError is thrown
+上面代码中，obj对象禁止扩展，结果使用has拦截就会报错。也就是说，如果某个
+属性不可配置（或者目标对象不可扩展），则has()方法就不得”隐藏“（即返回false）
+目标对象的该属性。
+值得注意的是，has()方法拦截的是HasProperty操作，而不是HasOwnProperty操作
+，即has()方法不判断一个属性是对象自身的属性，还是继承的属性。
+
+另外，虽然for...in循环也用到了in运算符，但是has()拦截对for...in循环不生效。
+
 ```
