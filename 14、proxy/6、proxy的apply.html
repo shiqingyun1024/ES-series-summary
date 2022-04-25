@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>proxy的apply</title>
+</head>
+<body>
+    <script>
+        var target = function (){
+            return 'I am the target'
+        }
+        var handler = {
+            apply: function () {
+                return 'I am the proxy';
+            }
+        }
+        var p = new Proxy(target,handler) 
+        console.log(p()); // 调用代理之后的函数
+    </script>
+</body>
+</html>
