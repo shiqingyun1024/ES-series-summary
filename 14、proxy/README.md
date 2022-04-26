@@ -492,6 +492,32 @@ let handler = {
             console.log(`${target.name} 不及格`);
             return false
         }
+        return prop in target;
     }
 }
+let oproxy1 = new Proxy(stu1,handler);
+let oproxy2 = new Proxy(stu2,handler);
+'score' in oproxy1
+// 张三 不及格
+// false
+'score' in oproxy2
+// true
+for(let a in oproxy1){
+    console.log(oproxy1[a])
+}
+// 张三
+// 59
+for(let b in oproxy2){
+    console.log(oproxy2[b])
+}
+// 李四
+// 99
+上面代码中，has()拦截只对in运算符生效，对for...in循环不生效，
+导致不符合要求的属性没有被for...in循环所排除。
 ```
+## construct()
+```
+construct()方法用于拦截new命令，下面是拦截对象的写法。
+```
+
+
