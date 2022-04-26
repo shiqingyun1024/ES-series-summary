@@ -484,5 +484,14 @@ var p = new Proxy(obj,{
 ，即has()方法不判断一个属性是对象自身的属性，还是继承的属性。
 
 另外，虽然for...in循环也用到了in运算符，但是has()拦截对for...in循环不生效。
-
+let stu1 = { name: '张三',score:59};
+let stu2 = { name: '李四',score:99};
+let handler = {
+    has(target,prop){
+        if(prop === 'score' && target[prop] < 60){
+            console.log(`${target.name} 不及格`);
+            return false
+        }
+    }
+}
 ```
