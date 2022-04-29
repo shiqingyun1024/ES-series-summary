@@ -18,7 +18,7 @@
         var target = {};
         var proxy = new Proxy(target, handler);
         proxy.foo = 'bar' // 不会生效
-        console.log(proxy.foo)
+        console.log(proxy.foo) // undefined
     </script>
 </body>
 
