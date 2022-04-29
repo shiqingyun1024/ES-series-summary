@@ -538,6 +538,41 @@ const p = new Proxy(function(){},{
 (new p(1)).value
 // "called:1"
 // 10
+construct()方法***返回的必须是一个对象***，否则会报错。
+const p = new Proxy(function(){},{
+    construct:function(target,argumentsList){
+        return 1;
+    }
+});
+new p()  // 报错
+// Uncaught TypeError: 'construct' on proxy: trap returned non-object ('1')
+
+另外，由于construct()拦截的是构造函数，***所以它的目标对象必须是函数***，否则就会报错。
+const p = new Proxy({},{
+    construct:function(target,argumentsList){
+        return {};
+    }
+})
+new p() // 报错
+// Uncaught TypeError: p is not a constructor
+
+上面例子中，拦截的目标对象不是一个函数，而是一个对象（new Proxy()的第一个
+参数），导致报错。
+
+注意，construct()方法中的this指向的是handler，而不是实例对象。
+const handler = {
+    construct:function(target,args){
+        console.log(this === handler);
+        return new target(...args)
+    }
+}
+let p = new Proxy(function(){},handler);
+new p() // true
+```
+## deleteProperty()
+```
+deleteProperty方法用于拦截delete操作，如果这个方法抛出错误或者返回false，
+当前
 ```
 
 
