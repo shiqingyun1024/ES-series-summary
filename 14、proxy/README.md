@@ -652,6 +652,10 @@ Object.getPrototypeOf(p) === proto // true
 proto对象。
 注意，getPrototypeOf()方法的返回值必须是对象或者null，否则报错。另外，如果目标对象不可扩展（non-extensible）， getPrototypeOf()方法必须返回目标对象的原型对象。
 ```
+## isExtensible()
+```
+```
+
 
 
 
