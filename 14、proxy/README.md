@@ -654,6 +654,33 @@ proto对象。
 ```
 ## isExtensible()
 ```
+isExtensible()方法拦截Object.isExtensible()操作
+
+var p = new Proxy({},{
+    isExtensible:function(target){
+        console.log("called");
+        return true;
+    }
+});
+Object.isExtensible(p)
+// "called"
+// true
+
+上面代码设置了isExtensible()方法，在调用Object.isExtensible时会输出
+called。
+注意，该方法只能返回布尔值，否则返回值被自动转为布尔值。
+这个方法有一个强限制，它的返回值必须与目标对象的isExtensible属性保持一致，
+否则就会抛出错误。
+Object.isExtensible(proxy) === Object.isExtensible(target)
+下面是一个例子
+var p = new Proxy({},{
+    isExtensible:function(target){
+        return false;
+    }
+})
+Object.isExtensible(p)
+// Uncaught TypeError: 'isExtensible' on proxy: trap result does not 
+// reflect extensibility of proxy target (which is 'true')
 ```
 
 
