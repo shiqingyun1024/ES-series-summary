@@ -682,6 +682,75 @@ Object.isExtensible(p)
 // Uncaught TypeError: 'isExtensible' on proxy: trap result does not 
 // reflect extensibility of proxy target (which is 'true')
 ```
+## ownKeys()
+```
+ownKeys()方法用来拦截对象自身属性的读取操作。具体来说，拦截以下操作。
+- Object.getOwnPropertyNames()
+- Object.getOwnPropertySymbols()
+- Object.keys()
+- for...in循环
+下面是拦截Object.keys()的例子。
+let target = {
+    a:1,
+    b:2,
+    c:3
+}
+let handler = {
+    ownKeys(target){
+       return ['a'];
+    }
+}
+let proxy = new Proxy(target,handler);
+Object.keys(proxy)
+// ['a']
+上面代码拦截了对于target对象的Object.keys()操作，只返回a、b、c三个属性
+之中的a属性。
+下面的例子是拦截第一个字符为下划线的属性名(筛选出第一个字符不是下划线的属性)。
+let target = {
+    _bar:'foo',
+    _prop:'bar',
+    prop:'baz'
+}
+let handler = {
+    ownKeys(target){
+        return Reflect.ownKeys(target).filter(key=>key[0]!=='_');
+    }
+}
+let proxy = new Proxy(target,handler);
+for(let key of Obejct.keys(proxy)){
+    console.log(target[key]);
+}
+// "baz"
+注意，使用Object.keys()方法时，有三类属性会被ownKeys()方法自动过滤，不会
+返回。
+- 目标对象上不存在的属性
+- 属性名为Symbol值
+- 不可遍历（enumerable）的属性
+
+let target = {
+    a:1,
+    b:2,
+    c:3,
+    [Symbol.for('secret')]:'4',
+};
+Object.defineProperty(target,'key',{
+    enumerable:false,  // 遍历
+    configurable: true, // 删除
+    writable: true,  // 修改
+    value: 'static'
+})
+let handler = {
+    ownKeys(target){
+        return ['a','d',Symbol.for('secret'),'key'];
+    }
+}
+let proxy = new Proxy(target,handler);
+
+Obejct.keys(proxy)
+// ['a']
+上面代码中，ownKeys()方法之中，显式返回不存在的属性（d）、Symbol 值（Symbol.for
+('secret')）、不可遍历的属性（key），结果都被自动过滤掉。
+```
 
 
 
