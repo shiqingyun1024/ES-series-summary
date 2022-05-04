@@ -900,3 +900,47 @@ Proxy.revocable()的一个使用场景是，目标对象不允许直接访问，
 
 
 
+
+
+
+# this问题
+```
+虽然Proxy可以代理针对目标对象的访问，但它不是目标对象的透明代理，即不做任何
+拦截的情况下，也无法保证与目标对象的行为一致。主要原因就是在Proxy代理的情况下，
+目标对象内部的this关键字会指向Proxy代理。
+const target = {
+    m:function(){
+        console.log(this === proxy);
+    }
+};
+const handler = {};
+const proxy = new Proxy(target,handler);
+target.m() // false
+proxy.m() // true
+上面代码中，一旦proxy代理target，target.m()内部的this就是指向proxy，而
+不是target。所以，虽然proxy没有做任何拦截，target.m()和proxy.m()返回不一样的
+结果。
+下面是一个例子，由于this指向的变化，导致Proxy无法代理目标对象。
+const _name = new WeakMap();
+class Person {
+    constructor(name) {
+        _name.set(this,name);
+    }
+    get name(){
+        return _name.get(this);
+    }
+}
+const jane = new Person('Jane');
+jane.name // 'Jane'
+
+const proxy = new Proxy(jane,{});
+proxy.name // undefined
+
+上面代码中，目标对象jane的name属性，实际上保存在外部WeakMap对象_name上面，
+通过this键区分。由于通过proxy.name访问时，this指向proxy，导致无法取到值，
+所以返回undefined。
+```
+
+
+
+
