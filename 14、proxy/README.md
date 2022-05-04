@@ -5,7 +5,7 @@ Proxy
 4、this问题
 5、实例：web服务的客户端
 
-## 1、概述
+# 1、概述
 ```
 Proxy用于修改某些操作的默认行为，等同于在语言层面做出修改，所以属于一种“元
 编程”（meta programming），即对编程语言进行编程。
@@ -137,8 +137,8 @@ proxy(...args)、proxy.call(object, ...args)、proxy.apply(...)。
 - construct(target, args)：拦截 Proxy 实例作为构造函数调用的操作，
 比如new proxy(...args)。      
 ```
-## 2、Proxy实例的方法
-### get()
+# 2、Proxy实例的方法
+## get()
 ```
 下面是上面这些拦截方法的详细介绍。
 get()
@@ -285,7 +285,7 @@ const proxy = new Proxy(target,handler);
 proxy.foo
 // TypeError: Invariant check failed
 ```
-### set()
+## set()
 ```
 set方法用来拦截某个属性的赋值操作，可以接受四个参数，依次为目标对象、属性
 名、属性值和Proxy实例本身，其中最后一个参数可选。
@@ -872,6 +872,30 @@ Object.setPrototypeOf(proxy, proto);
 
 
 
+
+
+
+
+# Proxy.revocable()
+、、、
+Proxy.revocable()方法返回一个可取消的 Proxy 实例。
+let target = {};
+let handler = {};
+
+let {proxy, revoke} = Proxy.revocable(target, handler);
+
+proxy.foo = 123;
+proxy.foo // 123
+
+revoke();
+proxy.foo // TypeError: Revoked
+Proxy.revocable()方法返回一个对象，该对象的proxy属性是Proxy实例，revoke属性是一个
+函数，可以取消Proxy实例。上面代码中，当执行revoke函数之后，再访问Proxy实例，就会抛出
+一个错误。
+
+Proxy.revocable()的一个使用场景是，目标对象不允许直接访问，必须通过代理访问，一旦访问
+结束，就收回代理权，不允许再次访问。
+、、、
 
 
 
