@@ -824,7 +824,35 @@ obj对象的多余属性b，所以导致了报错。
 ```
 ## preventExtensions()
 ```
-preventExtensions()方法拦截Object.preventExtensions()
+preventExtensions()方法拦截Object.preventExtensions()。该方法必须返回一个
+布尔值，否则会被自动转为布尔值。
+这个方法有一个限制，只有目标对象不可扩展时（即Object.isExtensible(proxy)为
+false），proxy.preventExtensions才能返回true，否则报错。
+var proxy = new Proxy({},{
+    preventExtensions:function(target){
+       return true;
+    }
+});
+Object.preventExtensions(proxy)
+// Uncaught TypeError: 'preventExtensions' on proxy: trap returned 
+truish but the proxy target is extensible
+上面代码中，proxy.preventExtensions()方法返回true，但这时
+Object.isExtensible(proxy)会返回true，因此报错。
+为了防止出现这个问题，通常要在proxy.preventExtensions()方法里面，
+调用一次Object.preventExtensions()
+var proxy = new Proxy({},{
+    preventExtensions:function(target){
+        console.log('called');
+        Object.preventExtensions(target);
+        return true;
+    }
+})
+Obejct.preventExtensions(proxy)
+// "called"
+// proxy {}
+```
+## setPrototypeOf()
+```
 ```
 
 
