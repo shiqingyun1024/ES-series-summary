@@ -963,6 +963,44 @@ const handler = {
 }
 const proxy = new Proxy(target,handler);
 proxy.getDate() // 1
+另外，Proxy拦截函数内部的this,指向的是handler对象。
+const handler = {
+    get:function(target,key,receiver) {
+        console.log(this === handler);
+        return 'Hello,'+key;
+    }
+    set:function(target,key,value) {
+        console.log(this === handler);
+        target[key] = value;
+        return true;
+    }
+}
+const proxy = new Proxy({},handler);
+proxy.foo
+// true
+// Hello,foo
+proxy.foo = 1
+// true
+上面例子中，get()和set()拦截函数内部的this，指向的都是handler对象。
+```
+## 5.实例：Web 服务的客户端 
+```
+Proxy对象可以拦截目标对象的任意属性，这使得它很合适用来写Web服务的客户端。
+const service = createWebService('http://example.com/data');
+service.employees().then(json=>{
+    const employees = JSON.parse(json)
+    // ...
+})
+上面代码新建了一个Web服务的接口，这个接口返回各种数据。Proxy可以拦截这个
+对象的任意属性，所以不用为每一种数据写一个适配方法，只要写一个Proxy拦截就可以了。
+function createWebService(baseUrl) {
+    return new Proxy({},{
+        get(target,propKey,receiver){
+            return ()=>httpGet(baseUrl+'/'+propKey);
+        }
+    })
+}
+同理，Proxy也可以用来实现数据库的ORM层。
 
 ```
 
