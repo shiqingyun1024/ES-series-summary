@@ -939,6 +939,31 @@ proxy.name // undefined
 上面代码中，目标对象jane的name属性，实际上保存在外部WeakMap对象_name上面，
 通过this键区分。由于通过proxy.name访问时，this指向proxy，导致无法取到值，
 所以返回undefined。
+
+此外，有些原生对象的内部属性，只有通过正确的this才能拿到，所以Proxy也无法代理
+这些原生对象的属性。
+const target = new Date();
+const handler = {};
+const proxy = new Proxy(target,handler);
+proxy.getDate();
+// TypeError:this is not a Date object
+
+上面代码中，getDate()方法只能在Date对象实例上面拿到，如果this不是
+Date对象实例就报错。这时，this绑定原始对象，就可以解决这个问题。
+const target = new Date('2015-01-01');
+const handler = {
+    get(target,prop,receiver){
+        if(prop === 'getDate') {
+    // target是原始对象new Date('2015-01-01')，receiver是代理之后的对象proxy
+            // 所以在这里又重新绑定到原始对象上
+            return target.getDate.bind(target); 
+        }
+        return Reflect.get(target.prop);
+    }
+}
+const proxy = new Proxy(target,handler);
+proxy.getDate() // 1
+
 ```
 
 
