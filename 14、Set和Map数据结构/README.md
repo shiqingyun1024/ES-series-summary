@@ -181,6 +181,12 @@ set.forEach((value,key)=>console.log(key+':'+value))
 forEach一致，依次为键值、键名、集合本身（上例省略了该函数）。这里需要注意，
 Set结构的键名就是键值（两者是同一个值），因此第一个参数与第二个参数的值永远
 都是一样的。
+
+另外，forEach方法还可以有第二个参数，表示绑定处理函数内部的this对象。
+（3）遍历的应用
+扩展运算符（...）内部使用for...of循环，所以也可以用于Set结构。
+let set = new Set(['red','green','blue']);
+let arr = [...set];
 ```
 
 
