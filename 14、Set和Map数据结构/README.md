@@ -134,6 +134,30 @@ keys方法、values方法、entries方法返回的都是遍历器对象（详见
 一章）。由于Set结构没有键名，只有键值（或者说键名和键值是同一个值），所以keys方法
 和values方法的行为完全一致。
 
+let set = new Set(['red','green','blue']);
+for(let item of set.keys()){
+    console.log(item);
+}
+// red
+// green
+// blue
+
+for(let item of set.values){
+    console.log(item);
+}
+// red
+// green
+// blue
+
+for(let item of set.entries()){
+    console.log(item);
+}
+// ["red","red"]
+// ["green","green"]
+// ["blue","blue"]
+上面代码中，entries方法返回的遍历器，同时包括键名和键值，所以每次输出
+一个数组，它的两个成员完全相等。
+Set结构的实例默认可遍历，它的默认遍历器生成函数就是它的values方法。
 ```
 
 
