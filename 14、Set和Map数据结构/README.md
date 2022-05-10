@@ -118,8 +118,24 @@ function dedupe(array){
     return Array.from(new Set(array));
 }
 dedupe([1,2,2,3,1]) // [1,2,3]
+```
+### 遍历操作
+```
+Set结构的实例有四个遍历方法，可以用于遍历成员。
+- Set.prototype.keys()：返回键名的遍历器
+- Set.prototype.values()：返回键值的遍历器
+- Set.prototype.entries()：返回键值对的遍历器
+- Set.prototype.forEach()：使用回调函数遍历每个成员
+
+需要特别指出的是，Set的遍历顺序就是插入顺序。这个特性有时非常有用，比如使用
+Set保存一个回调函数列表，调用时就能保证按照添加顺序调用。
+（1）keys(),values(),entries()
+keys方法、values方法、entries方法返回的都是遍历器对象（详见《Iterator对象》
+一章）。由于Set结构没有键名，只有键值（或者说键名和键值是同一个值），所以keys方法
+和values方法的行为完全一致。
 
 ```
+
 
 
 
