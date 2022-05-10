@@ -158,6 +158,26 @@ for(let item of set.entries()){
 上面代码中，entries方法返回的遍历器，同时包括键名和键值，所以每次输出
 一个数组，它的两个成员完全相等。
 Set结构的实例默认可遍历，它的默认遍历器生成函数就是它的values方法。
+Set.prototype[Symbol.iterator] === Set.prototype.values
+// true
+这就意味着，可以省略values方法，直接用for...of循环遍历Set。
+let set = new Set(['red','green','blue'])
+
+for(let x of set){
+    console.log(x);
+}
+// red
+// green
+// blue
+(2) forEach()
+Set结构的实例与数组一样，也拥有forEach方法，用于对每个成员执行某种操作，
+没有返回值。
+let set = new Set([1,4,9]);
+set.forEach((value,key)=>console.log(key+':'+value))
+// 1:1
+// 4:4
+// 9:9
+
 ```
 
 
