@@ -240,6 +240,11 @@ ws.add(1)
 // TypeError: Invalid value used in weak set
 ws.add(Symbol())
 // TypeError: invalid value used in weak set
+上面代码试图向WeakSet添加一个数值和Symbol值，结果报错，因为WeakSet
+只能放置对象。
+其次，WeakSet中的对象都是弱引用，即垃圾回收机制不考虑WeakSet对该对象
+的引用，也就是说，如果其他对象都不再引用该对象，那么垃圾回收机制会自动回收
+该对象所占用的内存，不考虑对象还存在于WeakSet之中。
 ```
 
 
