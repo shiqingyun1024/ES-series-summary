@@ -214,6 +214,20 @@ let intersect = new Set([...a].filter(x=>b.has(x)));
 //(a相对于b的)差集
 let difference = new Set([...a].filter(x=>!b.has(x)));
 // Set {1}
+如果想在遍历操作中，同步改变原来的Set结构，目前没有直接的方法，但有两种变
+通方法。一种是利用原Set结构映射出一个新的结构，然后赋值给原来的Set结构；
+另一种是利用Array.from方法。
+// 方法一
+let set = new Set([1,2,3]);
+set = new Set([...set].map(val=>val*2));
+// set的值是2,4,6
+
+// 方法二
+let set = new Set([1,2,3]);
+set = new Set(Array.from(set,val=>val*2));
+// set的值是2,4,6
+Array.from(arr, mapfn,thisArg)方法，用于将两类可以把对象转换为真正的数组：类似数组的对象和可遍历的对象（部署了Iterator接口的，String，ES6新增的Map和Set）。可以传3个参数，其中第一个是数组，必传；第二个是一个函数（类似map函数），对数组元素进行操作后再返回数组，可选；第三个是对于 this关键字的指向，可选。
+
 ```
 
 
