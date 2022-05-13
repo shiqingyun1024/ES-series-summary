@@ -228,8 +228,19 @@ set = new Set(Array.from(set,val=>val*2));
 // set的值是2,4,6
 Array.from(arr, mapfn,thisArg)方法，用于将两类可以把对象转换为真正的数组：类似数组的对象和可遍历的对象（部署了Iterator接口的，String，ES6新增的Map和Set）。可以传3个参数，其中第一个是数组，必传；第二个是一个函数（类似map函数），对数组元素进行操作后再返回数组，可选；第三个是对于 this关键字的指向，可选。
 
+上面代码提供了两种方法，直接在遍历操作中改变原来的 Set 结构。
 ```
-
+## WeakSet
+```
+含义
+WeakSet结构与Set类似，也是不重复的值的集合。但是，它与Set有两个区别。
+首先，WeakSet的成员只能是对象，而不能是其他类型的值。
+const ws = new WeakSet();
+ws.add(1)
+// TypeError: Invalid value used in weak set
+ws.add(Symbol())
+// TypeError: invalid value used in weak set
+```
 
 
 
