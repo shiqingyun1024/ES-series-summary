@@ -193,6 +193,27 @@ let arr = [3,5,2,2,5,3,5];
 let unique = [...new Set(arr)]; // 或者是Array.from(new Set(arr))
 // [3,5,2]
 而且，数组的map和filter方法也可以间接用于Set了。
+
+let set = new Set([1,2,3]);
+set = new Set([...set].map(x=>x*2));
+// 返回Set结构：{2,4,6}
+let set = new Set([1,2,3,4,5]);
+set = new Set([...set].filter(x=>(x%2)==0));
+// 返回Set结构：{2,4}
+因此使用Set可以很容易地实现并集(Union)、交集(Intersert)和差集（Difference）
+let a = new Set([1,2,3]);
+let b = new Set([4,2,3]);
+// 并集
+let union = new Set([...a,...b]);
+// Set {1,2,3,4}
+
+// 交集
+let intersect = new Set([...a].filter(x=>b.has(x)));
+// set {2,3}
+
+//(a相对于b的)差集
+let difference = new Set([...a].filter(x=>!b.has(x)));
+// Set {1}
 ```
 
 
