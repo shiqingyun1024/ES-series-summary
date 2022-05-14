@@ -258,6 +258,18 @@ WeakSet不可遍历。
 ```
 ### 语法
 ```
+WeakSet是一个构造函数，可以使用new命令，创建WeakSet数据结构。
+const ws = new WeakSet();
+作为构造函数，WeakSet可以接受一个数组或类似数组的对象作为参数。
+（实际上，任何具有Iterable接口的对象，都可以作为WeakSet的参数。）
+该数组的所有成员，都会自动成为WeakSet实例对象的成员。
+const a = [[1,2],[3,4]];
+const ws = new WeakSet(a);
+// WeakSet {[1,2],[3,4]}
+上面代码中，a是一个数组，它有两个成员，也都是数组。将a作为WeakSet构造
+函数的参数，a的成员会自动成为WeakSet的成员。
+注意，是a数组的成员成为WeakSet的成员，而不是a数组本身。这意味着，数组
+的成员只能是对象。（WeakSet的成员只能是对象，而不能是其他类型的值。）
 ```
 
 
