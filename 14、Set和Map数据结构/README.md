@@ -300,7 +300,30 @@ ws.forEach(function(item){
 })
 // TypeError:undefined is not a function
 上面代码试图获取size和forEach属性，结果都不能成功。
+
+WeakSet不能遍历，是因为成员都是弱引用，随时可能消失，遍历机制
+无法保证成员的存在，很可能刚刚遍历结束，成员就取不到值了。WeakSet
+的一个用处，是储存DOM节点，而不用担心这些节点从文档移除时，会引发内存泄露
+("===为什么会这样说呢===")。
+
+下面是WeakSet的另外一个例子。
+const foos = new WeakSet();
+class Foo{
+    constructor(){
+        foos.add(this)
+    }
+    method(){
+        if(!foos.has(this)){
+            throw new TypeError('Foo.prototype.method 只能在Foo的实例上调用！');
+        }
+    }
+}
+
+上面代码保证了Foo的实例方法，只能在Foo的实例上调用。这里使用WeakSet的好处是，
+foos对实例的引用，不会被计入内存回收机制，所以删除实例的时候，不用考虑foos，
+也不会出现内存泄露。
 ```
+## 3、Map
 
 
 
