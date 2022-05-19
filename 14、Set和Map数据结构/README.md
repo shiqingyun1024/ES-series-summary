@@ -270,7 +270,36 @@ const ws = new WeakSet(a);
 函数的参数，a的成员会自动成为WeakSet的成员。
 注意，是a数组的成员成为WeakSet的成员，而不是a数组本身。这意味着，数组
 的成员只能是对象。（WeakSet的成员只能是对象，而不能是其他类型的值。）
+const b = [3,4];
+const ws = new WeakSet(b);
+// Uncaught TypeError:Invalid value used in weak set(...)
+上面代码中，数组b的成员不是对象，加入WeakSet就会报错。
+WeakSet结构有以下三个方法。
+- WeakSet.prototype.add(value):向WeakSet实例添加一个新成员。
+- WeakSet.prototype.delete(value):清除WeakSet实例的指定成员。
+- WeakSet.prototype.has(value):返回一个布尔值，表示某个值是否在WeakSet实例之中。
 
+下面是一个例子。
+const ws = new WeakSet();
+const obj = {};
+const foo = {};
+ws.add(window);
+ws.add(obj);
+
+ws.has(window); // true
+ws.has(foo); // false
+
+ws.delete(window);
+ws.has(window); // false
+
+WeakSet没有size属性，没办法遍历它的成员。
+ws.size  // undefined
+ws.forEach // undefined
+ws.forEach(function(item){
+    console.log('WeakSet has ' + item)
+})
+// TypeError:undefined is not a function
+上面代码试图获取size和forEach属性，结果都不能成功。
 ```
 
 
