@@ -324,6 +324,21 @@ foos对实例的引用，不会被计入内存回收机制，所以删除实例�
 也不会出现内存泄露。
 ```
 ## 3、Map
+```
+含义和基本用法
+JavaScript的对象（Object），本质上是键值对的集合（Hash结构），但是传统上
+只能用字符串当做键。这给它的使用带来了很大的限制。
+const data = {};
+const element = document.getElementById('myDiv');
+
+data[element] = 'metadata';
+data['[object HTMLDivElement]'] // "metedata"
+
+上面代码愿意是将一个DOM节点作为对象data的键，但是由于对象只接受字符串作为
+键名，所以element被自动转为字符串[object HTMLDivElement]。
+
+为了解决这个问题，ES6提供了Map数据结构
+```
 
 
 
