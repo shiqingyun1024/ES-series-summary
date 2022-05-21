@@ -337,7 +337,8 @@ data['[object HTMLDivElement]'] // "metedata"
 上面代码愿意是将一个DOM节点作为对象data的键，但是由于对象只接受字符串作为
 键名，所以element被自动转为字符串[object HTMLDivElement]。
 
-为了解决这个问题，ES6提供了Map数据结构
+为了解决这个问题，ES6提供了Map数据结构.它类似于对象，也是键值对的集合，但是
+‘键’的范围不限于字符串，各种类型的值（包括对象）都可以当作键。
 ```
 
 
