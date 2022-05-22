@@ -366,7 +366,21 @@ map.has('name') // true
 map.get('name') // '张三'
 map.has('title') // true
 map.get('title') // 'Author'
-上面代码在新建Map实例时，就指定了两个键name和title
+上面代码在新建Map实例时，就指定了两个键name和title。
+
+Map构造函数接受数组作为参数，实际上执行的是下面的算法。
+（”==Map实际上执行的是下面的步骤==“）
+const items = [
+    ['name','张三'],
+    ['title','Author']
+]
+const map = new Map();
+
+items.forEach(
+    ([key,value])=>map.set(key,value)
+);
+事实上，不仅仅是数组，任何具有Iterator接口，且每个成员都是一个双元素
+的数组结构（详见《Iterator》一章）
 ```
 
 
