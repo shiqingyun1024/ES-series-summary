@@ -327,7 +327,9 @@ foos对实例的引用，不会被计入内存回收机制，所以删除实例�
 ```
 含义和基本用法
 JavaScript的对象（Object），本质上是键值对的集合（Hash结构），但是传统上
-只能用字符串当做键。这给它的使用带来了很大的限制。
+只能用字符串当做键（”===实验了一下，如果用数字当做键，取值的时候，会报
+Uncaught SyntaxError: Unexpected number===“）。
+这给它的使用带来了很大的限制。
 const data = {};
 const element = document.getElementById('myDiv');
 
