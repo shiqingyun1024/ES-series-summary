@@ -380,7 +380,31 @@ items.forEach(
     ([key,value])=>map.set(key,value)
 );
 事实上，不仅仅是数组，任何具有Iterator接口，且每个成员都是一个双元素
-的数组结构（详见《Iterator》一章）
+的数组结构（详见《Iterator》一章）都可以当做Map构造函数的参数。这就是说，
+Set和Map都可以用来生成新的Map。
+const set = new Set([
+    ['foo',1],
+    ['bar',2]
+]);
+const m1 = new Map(set);
+m1.get('foo') // 1
+
+const m2 = new Map([['baz',3]]);
+const m3 = new Map(m2);
+m3.get('baz') // 3
+上面代码中，我们分别使用Set对象和Map对象，当做Map构造函数的参数，
+结构都生成了新的Map对象。
+如果对同一个键对此赋值，后面的值将覆盖前面的值。
+const map = new Map();
+map.set(1,'aaa').set(1,'bbb');
+map.get(1) // "bbb"
+上面的代码对键1连续赋值两次后，后一次的值覆盖前一次的值。
+如果读取一个未知的键，则返回undefined。
+new Map().get('asdfg')
+// undefined
+注意
+
+
 ```
 
 
