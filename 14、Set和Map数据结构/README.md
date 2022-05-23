@@ -402,9 +402,46 @@ map.get(1) // "bbb"
 如果读取一个未知的键，则返回undefined。
 new Map().get('asdfg')
 // undefined
-注意
+注意，只有对同一个对象的引用，Map结构才将其视为同一个键。这一点
+要非常小心。
+const map = new Map();
+map.set(['a'],555);
+map.get(['a']) // undefined
+上面代码的set和get方法，表面是针对同一个键，但实际上这是两个不同的数组
+实例，内存地址是不一样的，因此get方法无法读取该键，返回undefined。
+同理，同样的值的两个实例，在Map结构中被视为两个键。
+const map = new Map();
 
+const k1 = ['a'];
+const k2 = ['a'];
+map.set(k1,111).set(k2,222);
 
+map.get(k1) // 111
+map.get(k2) // 222
+上面代码中，变量k1和k2的值是一样的，但是它们在Map结构中被视为两个键。
+
+由上可知，Map的键实际上是跟内存地址绑定的，只要内存地址不一样，就视为
+两个键。这就解决了同名属性碰撞（clash）的问题，我们扩展别人的库的时候，
+如果使用对象作为键名，就不用担心自己的属性与原作者的属性同名。
+
+如果Map的键是一个简单类型的值（数字、字符串、布尔值），则只要两个值严格
+想等，Map将其视为一个键，比如0和-0就是一个键，布尔值true和字符串true则
+是两个不同的键。另外，undefined和null也是两个不同的键。虽然NaN不严格等于
+自身，但Map将其视为同一个键。
+let map = new Map();
+map.set(-0,123);
+map.get(+0) // 123
+
+map.set(true,1);
+map.set('true', 2);
+map.get(true) // 1
+
+map.set(undefined, 3);
+map.set(null, 4);
+map.get(undefined) // 3
+
+map.set(NaN, 123);
+map.get(NaN) // 123
 ```
 
 
