@@ -552,8 +552,41 @@ for (let [key, value] of map) {
 上面代码最后的那个例子，表示Map结构的默认遍历器接口（Symbol.iterator属性），
 就是entries方法。
 map[Symbol.iterator] === map.entries
-Map结构转为数组结构，比较快速的方法是使用扩展运算符（...）.
+Map结构转为数组结构，比较快速的方法是使用扩展运算符（...）。
+const map = new Map([
+  [1, 'one'],
+  [2, 'two'],
+  [3, 'three'],
+]);
 
+[...map.keys()]
+// [1, 2, 3]
+
+[...map.values()]
+// ['one', 'two', 'three']
+
+[...map.entries()]
+// [[1,'one'], [2, 'two'], [3, 'three']]
+
+[...map]
+// [[1,'one'], [2, 'two'], [3, 'three']]
+
+结合数组的map方法、filter方法，可以实现 Map 的遍历和过滤
+（Map 本身没有map和filter方法）。
+const map0 = new Map()
+  .set(1, 'a')
+  .set(2, 'b')
+  .set(3, 'c');
+
+const map1 = new Map(
+  [...map0].filter(([k, v]) => k < 3)
+);
+// 产生 Map 结构 {1 => 'a', 2 => 'b'}
+
+const map2 = new Map(
+  [...map0].map(([k, v]) => [k * 2, '_' + v])
+    );
+// 产生 Map 结构 {2 => '_a', 4 => '_b', 6 => '_c'}
 ```
 
 
