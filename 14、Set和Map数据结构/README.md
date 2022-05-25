@@ -443,6 +443,42 @@ map.get(undefined) // 3
 map.set(NaN, 123);
 map.get(NaN) // 123
 ```
+### 实例的属性和操作方法
+```
+Map结构的实例有以下属性和操作方法。
+（1）size属性
+size属性返回Map结构的成员总数。
+const map = new Map();
+map.set('foo',true);
+map.set('bar',false);
+
+map.size // 2
+
+(2) Map.prototype.set(key,value)
+set方法设置键名key对应的键值为value，然后返回整个Map结构。
+如果key已经有值，则键值会被更新，否则就新生成该键。
+const m = new Map();
+m.set('edition',6)  // 键是字符串
+m.set(262,'standrad')  // 键是数值
+m.set(undefined,'nah') // 键是undefined
+
+set方法返回的是当前的Map对象，因此可以采用链式写法。
+let map = new Map().set(1,'a').set(2,'b').set(3,'c')
+
+(3) Map.prototype.get(key)
+get方法读取key对应的键值，如果找不到key，返回undefined
+const m = new Map();
+const hello = function() { console.log('hello')}
+m.set(hello,'Hello ES6!') // 键是函数
+
+m.get(hello) // Hello ES6!
+
+
+
+
+
+```
+
 
 
 
