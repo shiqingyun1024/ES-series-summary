@@ -473,9 +473,86 @@ m.set(hello,'Hello ES6!') // 键是函数
 
 m.get(hello) // Hello ES6!
 
+（4）Map.prototype.has(key)
+has方法返回一个布尔值，表示某个键是否在当前Map对象之中。
+const m = new Map();
+m.set('edition',6)  // 键是字符串
+m.set(262,'standrad')  // 键是数值
+m.set(undefined,'nah') // 键是undefined
 
+m.has('edition')  // true
+m.has('years')  // false
+m.has(262)  // true
+m.has(undefined)  // true
 
+(5) Map.prototype.delete(key)
+delete 方法删除某个键，返回true。如果删除失败，返回false。
+const m = new Map();
+m.set(undefined,'nah')k
+m.has(undefined) // true
 
+m.delete(undefined)  // true
+m.has(undefined) // false
+
+(6) Map.prototype.clear()
+clear方法清除所有成员，没有返回值。
+let map = new Map();
+map.set('foo',true);
+map.set('bar',false);
+
+map.size // 2
+map.clear()
+map.size // 0
+```
+### 遍历方法
+```
+Map结构原生提供三个遍历器生成函数和一个遍历方法。
+- Map.prototype.keys()：返回键名的遍历器。
+- Map.prototype.values()：返回键值的遍历器。
+- Map.prototype.entries()：返回所有成员的遍历器。
+- Map.prototype.forEach()：遍历Map的所有成员。
+
+需要特别注意的是，Map的遍历顺序就是插入顺序。
+
+const map = new Map([
+    ['F','no'],
+    ['T','yes'],
+]);
+for(let key of map.keys()){
+    console.log(key);
+}
+// "F"
+// "T"
+for(let value of map.values()){
+    console.log(value);
+}
+// "no"
+// "yes"
+
+for(let item of map.entries()){
+    console.log(item[0],item[1]);
+}
+// "F" "no"
+// "T" "yes"
+
+// 或者
+for(let [key,value] of map.entries()){
+    console.log(key,value);
+}
+// "F" "no"
+// "T" "yes"
+
+// 等同于使用map.entries()
+for (let [key, value] of map) {
+  console.log(key, value);
+}
+// "F" "no"
+// "T" "yes"
+
+上面代码最后的那个例子，表示Map结构的默认遍历器接口（Symbol.iterator属性），
+就是entries方法。
+map[Symbol.iterator] === map.entries
+Map结构转为数组结构，比较快速的方法是使用扩展运算符（...）.
 
 ```
 
