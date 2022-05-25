@@ -594,7 +594,16 @@ map.forEach(function(value, key, map) {
 });
 forEach方法还可以接受第二个参数，用来绑定this。
 
+const reporter = {
+  report: function(key, value) {
+    console.log("Key: %s, Value: %s", key, value);
+  }
+};
 
+map.forEach(function(value, key, map) {
+  this.report(key, value);
+}, reporter);
+上面代码中，forEach方法的回调函数的this，就指向reporter。
 ```
 
 
