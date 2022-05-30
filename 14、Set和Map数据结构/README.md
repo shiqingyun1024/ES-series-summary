@@ -717,7 +717,24 @@ map.set(null, 2)
 // TypeError: Invalid value used as weak map key
 
 上面代码中，如果将数值1和Symbol值作为WeakMap的键名，都会报错。
-其次，WeakMap的键
+其次，WeakMap的键名所指向的对象，不计入垃圾回收机制。
+WeakMap的设计目的在于，有时我们想在某个对象上面存放一些数据，但是
+这会形成对于这个对象的引用。请看下面的例子。
+const e1 = document.getElementById('foo');
+const e2 = document.getElementById('bar');
+const arr = [
+    [e1,'foo元素'],
+    [e2,'bar元素'],
+];
+上面代码中，e1和e2是两个对象，我们通过arr数组对这两个对象添加一些文字
+说明。这就形成了arr对e1和e2的引用。
+一旦不再需要这两个对象，我们就必须手动删除这个引用，否则垃圾回收机制就不会
+释放e1和e2占用的内存。
+// 不需要e1和e2的时候
+// 必须手动删除引用
+arr[0] = null;
+arr[1] = null;
+
 ```
 
 
