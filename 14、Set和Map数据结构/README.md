@@ -705,7 +705,19 @@ const k2 = [4,5,6];
 const wm2 = new WeakMap([[k1,'foo'],[k2,'bar']]);
 wm2.get(k2) // "bar"
 
+WeakMap与Map的区别有两点。
+首先，WeakMap只接受对象作为键名（null除外），不接受其他类型
+的值作为键名。
+const map = new WeakMap();
+map.set(1,2)
+// TypeError: 1 is not an object!
+map.set(Symbol(),2)
+// TypeError: Invalid value used as weak map key
+map.set(null, 2)
+// TypeError: Invalid value used as weak map key
 
+上面代码中，如果将数值1和Symbol值作为WeakMap的键名，都会报错。
+其次，WeakMap的键
 ```
 
 
