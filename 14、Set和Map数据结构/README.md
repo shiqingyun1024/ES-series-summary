@@ -745,7 +745,17 @@ WeakMap就是为了解决这个问题而诞生的，它的键名所引用的对�
 一个典型应用场景是，在网页的DOM元素上添加数据，就可以使用WeakMap结构。当该DOM
 元素被清除，其所对应的WeakMap记录就会自动被移除。
 const wm = new WeakMap();
-const 
+const element = document.getElementById('example');
+
+wm.set(element,'some information');
+wm.get(element) // 'some information'
+
+上面代码中，先新建一个WeakMap实例。然后，将一个DOM节点作为键名存入该实例，并将
+一些附加信息作为键值，一起存放在WeakMap里面。这时，WeakMap里面对element的引用
+就是弱引用，不会被计入垃圾回收机制。
+
+也就是说，上面的DOM节点对象除了WeakMap的弱引用外，其他位置对该对象的引用一旦消除，
+该对象占用的内存就会被垃圾回收机制释放。WeakMap保存的这个键值对，也会自动消失。
 
 ```
 
