@@ -781,6 +781,14 @@ WeakMap与Map在API上的区别主要是两个，一是没有比遍历操作（�
 取到键名，下一刻垃圾回收机制突然运行了，这个键名就没了，为了防止出现不确定
 性，就统一规定不能取到键名。二是无法清空，即不支持clear方法。因此，
 WeakMap只有四个方法可用：get()、set()、has()、delete()。
+
+const wm = new WeakMap();
+
+// size、forEach、clear方法都不存在
+wm.size  // undefined
+wm.forEach // undefined
+wm.clear  // undefined
+
 ```
 
 
