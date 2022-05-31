@@ -788,7 +788,12 @@ const wm = new WeakMap();
 wm.size  // undefined
 wm.forEach // undefined
 wm.clear  // undefined
-
+```
+## WeakMap 的示例
+```
+WeakMap的例子很难演示，因为无法观察它里面的引用会自动消失。此时，其他
+引用都解除了，已经没有引用指向WeakMap的键名了，导致无法证实那个键名
+是不是存在。
 ```
 
 
