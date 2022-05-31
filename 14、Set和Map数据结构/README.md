@@ -773,6 +773,11 @@ wm.get(key)
 上面代码中，键值obj是正常引用。所以，即使在WeakMap外部消除了obj的引用，
 WeakMap内部的引用依然存在。**===这个地方是需要注意的点，内部 引用依然存在===**
 ```
+## WeakMap 的语法
+```
+WeakMap与Map在API上的区别主要是两个，一是没有比遍历操作（即没有keys()
+、values()和entries()方法）
+```
 
 
 
