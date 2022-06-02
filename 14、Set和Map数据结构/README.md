@@ -863,7 +863,17 @@ WeakMap 里面的引用是否消失。
 ## WeakMap 的用途
 ```
 前文说过，WeakMap 应用的典型场合就是 DOM 节点作为键名。下面是一个例子。
+let myWeakmap = new WeakMap();
 
+myWeakmap.set(
+  document.getElementById('logo'),
+  {timesClicked: 0}
+);
+
+document.getElementById('logo').addEventListener('click', function() {
+  let logoData = myWeakmap.get(document.getElementById('logo'));
+  logoData.timesClicked++;
+}, false);
 ```
 
 
