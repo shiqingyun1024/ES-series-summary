@@ -904,6 +904,14 @@ const c = new Countdown(2, () => console.log('DONE'));
 c.dec()
 c.dec()
 // DONE
+
+上面代码中，Countdown类的两个内部属性_counter和_action，是实例的弱引用，
+所以如果删除实例，它们也就随之消失，不会造成内存泄漏。
+```
+## 5.WeakRef
+```
+WeakSet 和 WeakMap 是基于弱引用的数据结构，ES2021 更进一步，提供了 WeakRef 对象，
+用于直接创建对象的弱引用。
 ```
 
 
