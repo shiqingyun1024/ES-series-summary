@@ -912,6 +912,11 @@ c.dec()
 ```
 WeakSet 和 WeakMap 是基于弱引用的数据结构，ES2021 更进一步，提供了 WeakRef 对象，
 用于直接创建对象的弱引用。
+let target = {};
+let wr = new WeakRef(target);
+上面示例中，target是原始对象，构造函数WeakRef()创建了一个基于target的新
+对象wr。这里，wr就是一个WeakRef的实例，属于对target的弱引用，垃圾回收机制
+不会计入这个引用，
 ```
 
 
