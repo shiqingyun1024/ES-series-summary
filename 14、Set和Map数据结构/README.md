@@ -951,8 +951,28 @@ const getImageCached = makeWeakCached(getImage);
 注意，标准规定，一旦使用WeakRef()创建了原始对象的弱引用，那么在本轮事件循环（event loop），
 原始对象肯定不会被清除，只会在后面的事件循环才会被清除。
 
+```
+## 6、FinalizationRegistry
+```
+ES2021 引入了清理器注册表功能 FinalizationRegistry，用来指定目标对象被垃圾回收机制清除以后，
+所要执行的回调函数。
 
+首先，新建一个注册表实例
+const registry = new FinalizationRegistry(heldValue => {
+  // ....
+});
+上面代码中，FinalizationRegistry()是系统提供的构造函数，返回一个清理器注册表实例，里面登记了所要执行的回调函数。回调函数作为FinalizationRegistry()的参数传入，它本身有一个参数heldValue。
 
+然后，注册表实例的register()方法，用来注册所要观察的目标对象。
+
+registry.register(theObject, "some value");
+上面示例中，theObject就是所要观察的目标对象，一旦该对象被垃圾回收机制清除，注册表就会在清除完成后，
+调用早前注册的回调函数，并将some value作为参数（前面的heldValue）传入回调函数。
+
+注意，注册表不对目标对象theObject构成强引用，属于弱引用。因为强引用的话，原始对象就不会被垃圾回收机制清除，
+这就失去使用注册表的意义了。
+
+回调函数的参数heldValue可以是任意类型的值，字符串、数值、布尔值、对象，甚至可以是undefined。
 
 
 ```
