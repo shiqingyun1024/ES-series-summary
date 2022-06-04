@@ -927,6 +927,29 @@ let obj = wr.deref();
 if(obj) { // target 未被垃圾回收机制清除
 
 }
+上面示例中，deref()方法可以判断原始对象是否已被清除。
+弱引用对象的一大用处，就是作为缓存，未被清除时可以从缓存取值，一旦清除缓存
+就自动失效。
+function makeWeakCached(f) {
+  const cache = new Map();
+  return key => {
+    const ref = cache.get(key);
+    if (ref) {
+      const cached = ref.deref();
+      if (cached !== undefined) return cached;
+    }
+
+    const fresh = f(key);
+    cache.set(key, new WeakRef(fresh));
+    return fresh;
+  };
+}
+
+const getImageCached = makeWeakCached(getImage);
+
+
+
+
 ```
 
 
