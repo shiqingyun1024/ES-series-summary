@@ -946,6 +946,11 @@ function makeWeakCached(f) {
 }
 
 const getImageCached = makeWeakCached(getImage);
+上面示例中，makeWeakCached()用于建立一个缓存，缓存里面保存对原始文件的弱引用。
+
+注意，标准规定，一旦使用WeakRef()创建了原始对象的弱引用，那么在本轮事件循环（event loop），
+原始对象肯定不会被清除，只会在后面的事件循环才会被清除。
+
 
 
 
