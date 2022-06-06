@@ -974,7 +974,12 @@ registry.register(theObject, "some value");
 
 回调函数的参数heldValue可以是任意类型的值，字符串、数值、布尔值、对象，甚至可以是undefined。
 
-
+最后，如果以后还想取消已注册的回调函数，则要向register()传入第三个参数，作为标记值。
+这个标记值必须是对象，一般用于原始对象。接着，再使用注册表实例对象的unregister()方法
+取消注册。
+registry.register(theObject, "some value", theObject);
+// ...其他操作...
+registry.unregister(theObject);
 ```
 
 
