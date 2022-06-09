@@ -9,5 +9,9 @@ ES5的对象属性名都是字符串，这容易造成属性名的冲突。比�
 
 ES6引入了一种新的原始数据类型Symbol，表示独一无二的值。它属于JavaScript
 语言的数据类型之一，其他数据类型是：undefined、null、布尔值（Boolean）、
-字符串（String）、数值（Number）、大整数（BigInt）、对象（Object）
+字符串（String）、数值（Number）、大整数（BigInt）、对象（Object）。
+
+Symbol值通过Symbol()函数生成。这就是说，对象的属性名现在可以有两种类型，
+一种是原来就有的字符串，另一种就是新增的Symbol类型。凡是属性名属于Symbol
+类型，就都是独一无二的，可以保证不会与其他属性名产生冲突。
 ```
