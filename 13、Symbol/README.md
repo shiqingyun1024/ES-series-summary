@@ -17,4 +17,7 @@ Symbol值通过Symbol()函数生成。这就是说，对象的属性名现在可
 let s = Symbol();
 
 typeof s  // "symbol"
+
+上面代码中，变量s就是一个独一无二的值。typeof运算符的结果，表明变量s是Symbol
+数据类型，而不是字符串之类的其他类型。
 ```
