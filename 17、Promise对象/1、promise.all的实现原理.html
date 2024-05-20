@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>promise.all的原理</title>
+</head>
+
+<body>
+    <script>
+        function promiseAll(promises) {
+            return new Promise((resolve, reject) => {
+                if (!Array.isArray(promises)) {
+                    return reject(new Error('传入的参数不是一个数组'))
+                }
+                if (promises.length == 0) {
+                    resolve([])
+                }
+
+                let [promisesLength, promisesArray, count] = [promises.length, new Array(promisesLength), 0];
+                for (let i = 0; i < promisesLength; i++) {
+                    Promise.resolve(promises[i]).then(value => {
+                        count++;
+                        promisesArray[i] = value;
+                        if (count == promisesLength) {
+                            return resolve(promisesArray)
+                        }
+                    }, error => {
+                        return reject(error)
+                    })
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>
