@@ -64,6 +64,75 @@
                 }
             }
         }
+
+        async function async1() {
+            console.log("async1 start");
+            // await async2();
+            // 等同于
+            new Promise((resolve, reject) => {
+                console.log("async2");
+                resolve()
+            }).then(value => {
+                console.log("async1 end");
+            })
+
+        }
+
+        async function async2() {
+            console.log("async2");
+        }
+
+
+
+        console.log("script start");
+
+        setTimeout(function () {
+            console.log("setTimeout");
+        }, 0);
+
+        async1();
+
+        new Promise(function (resolve) {
+            console.log("promise1");
+            resolve();
+        }).then(function () {
+            console.log("promise2");
+        });
+
+        console.log("script end");
+
+        // script start
+        // async1 start
+        // async2
+        // promise1
+        // script end
+        // async1 end
+        // promise2
+        // setTimeout
+
+        async function fn1() {
+            console.log("fn1 start");
+            await fn2();
+            console.log("fn1 end");
+            await fn3();
+            console.log("fn3 end");
+        }
+        async function fn2() {
+            console.log("fn2");
+        }
+        async function fn3() {
+            console.log("fn3");
+        }
+        console.log("start");
+        fn1();
+        console.log("end");
+        // start
+        // fn1 start
+        // fn2
+        // end
+        // fn1 end
+        // fn3
+        // fn3 end
     </script>
 </body>
 
