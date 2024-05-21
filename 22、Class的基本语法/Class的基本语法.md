@@ -103,6 +103,38 @@ const b = new B();
 b.constructor === B.prototype.constructor // true
 
 上面代码中，b是B类的实例，它的constructor()方法就是B类原型的constructor()方法。
+
+由于类的方法都定义在prototype对象上面，所以类的新方法可以添加在prototype对象上面。Object.assign()方法可以很方便地一次向类添加多个方法。
+
+class Point {
+  constructor(){
+    // ...
+  }
+}
+
+Object.assign(Point.prototype, {
+  toString(){},
+  toValue(){}
+});
+
+prototype对象的constructor属性，直接指向“类”的本身，这与 ES5 的行为是一致的。
+Point.prototype.constructor === Point // true
+另外，类的内部所有定义的方法，都是不可枚举的（non-enumerable）。
+
+class Point {
+  constructor(x, y) {
+    // ...
+  }
+
+  toString() {
+    // ...
+  }
+}
+
+Object.keys(Point.prototype)
+// []
+Object.getOwnPropertyNames(Point.prototype)
+// ["constructor","toString"]
 ```
 
 ```js
