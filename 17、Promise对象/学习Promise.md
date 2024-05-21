@@ -728,6 +728,25 @@ try {
 } catch (error) {
   console.log(error);
 }
+
+上面代码中，Promise.any()方法的参数数组包含三个 Promise 操作。其中只要有一个变成fulfilled，Promise.any()返回的 Promise 对象就变成fulfilled。如果所有三个操作都变成rejected，那么await命令就会抛出错误。
+
+Promise.any()抛出的错误是一个 AggregateError 实例（详见《对象的扩展》一章），这个 AggregateError 实例对象的errors属性是一个数组，包含了所有成员的错误。
+
+下面是一个例子。
+
+var resolved = Promise.resolve(42);
+var rejected = Promise.reject(-1);
+var alsoRejected = Promise.reject(Infinity);
+
+Promise.any([resolved, rejected, alsoRejected]).then(function (result) {
+  console.log(result); // 42
+});
+
+Promise.any([rejected, alsoRejected]).catch(function (results) {
+  console.log(results instanceof AggregateError); // true
+  console.log(results.errors); // [-1, Infinity]
+});
 ```
 
 ```js
