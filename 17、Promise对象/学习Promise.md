@@ -751,19 +751,153 @@ Promise.any([rejected, alsoRejected]).catch(function (results) {
 ## 10、Promise.resolve()
 
 ```js
+有时需要将现有对象转为 Promise 对象，Promise.resolve()方法就起到这个作用。
+const jsPromise = Promise.resolve($.ajax('/whatever.json'));
+上面代码将 jQuery 生成的deferred对象，转为一个新的 Promise 对象。
+Promise.resolve()等价于下面的写法。
+Promise.resolve('foo')
+// 等价于
+new Promise(resolve => resolve('foo'))
 
+Promise.resolve()方法的参数分成四种情况。
+（1）参数是一个 Promise 实例
+如果参数是 Promise 实例，那么Promise.resolve将不做任何修改、原封不动地返回这个实例。
+
+（2）参数是一个thenable对象
+thenable对象指的是具有then方法的对象，比如下面这个对象。
+let thenable = {
+  then: function(resolve, reject) {
+    resolve(42);
+  }
+};
+Promise.resolve()方法会将这个对象转为 Promise 对象，然后就立即执行thenable对象的then()方法。
+let thenable = {
+  then: function(resolve, reject) {
+    resolve(42);
+  }
+};
+
+let p1 = Promise.resolve(thenable);
+p1.then(function (value) {
+  console.log(value);  // 42
+});
+上面代码中，thenable对象的then()方法执行后，对象p1的状态就变为resolved，从而立即执行最后那个then()方法指定的回调函数，输出42。
+
+（3）参数不是具有then()方法的对象，或根本就不是对象
+如果参数是一个原始值，或者是一个不具有then()方法的对象，则Promise.resolve()方法返回一个新的 Promise 对象，状态为resolved。
+const p = Promise.resolve('Hello');
+
+p.then(function (s) {
+  console.log(s)
+});
+// Hello
+
+上面代码生成一个新的 Promise 对象的实例p。由于字符串Hello不属于异步操作（判断方法是字符串对象不具有 then 方法），返回 Promise 实例的状态从一生成就是resolved，所以回调函数会立即执行。Promise.resolve()方法的参数，会同时传给回调函数。
+
+（4）不带有任何参数
+Promise.resolve()方法允许调用时不带参数，直接返回一个resolved状态的 Promise 对象。
+
+所以，如果希望得到一个 Promise 对象，比较方便的方法就是直接调用Promise.resolve()方法。
+const p = Promise.resolve();
+
+p.then(function () {
+  // ...
+});
+上面代码的变量p就是一个 Promise 对象。
+
+需要注意的是，立即resolve()的 Promise 对象，是在本轮“事件循环”（event loop）的结束时执行，而不是在下一轮“事件循环”的开始时。
+setTimeout(function () {
+  console.log('three');
+}, 0);
+
+Promise.resolve().then(function () {
+  console.log('two');
+});
+
+console.log('one');
+
+// one
+// two
+// three
+
+上面代码中，setTimeout(fn, 0)在下一轮“事件循环”开始时执行，Promise.resolve()在本轮“事件循环”结束时执行，console.log('one')则是立即执行，因此最先输出。
 ```
+## 11、Promise.reject()
+```js
+Promise.reject(reason)方法也会返回一个新的 Promise 实例，该实例的状态为rejected。
+const p = Promise.reject('出错了');
+// 等同于
+const p = new Promise((resolve, reject) => reject('出错了'))
+
+p.then(null, function (s) {
+  console.log(s)
+});
+// 出错了
+
+上面代码生成一个 Promise 对象的实例p，状态为rejected，回调函数会立即执行。
+Promise.reject()方法的参数，会原封不动地作为reject的理由，变成后续方法的参数。
+Promise.reject('出错了')
+.catch(e => {
+  console.log(e === '出错了')
+})
+// true
+上面代码中，Promise.reject()方法的参数是一个字符串，后面catch()方法的参数e就是这个字符串。
+```
+## 12、应用
 
 ```js
+加载图片
+我们可以将图片的加载写成一个Promise，一旦加载完成，Promise的状态就发生变化。
+const preloadImage = function (path) {
+  return new Promise(function (resolve, reject) {
+    const image = new Image();
+    image.onload  = resolve;
+    image.onerror = reject;
+    image.src = path;
+  });
+};
+
+Generator 函数与 Promise 的结合
+使用 Generator 函数管理流程，遇到异步操作的时候，通常返回一个Promise对象。
+function getFoo () {
+  return new Promise(function (resolve, reject){
+    resolve('foo');
+  });
+}
+
+const g = function* () {
+  try {
+    const foo = yield getFoo();
+    console.log(foo);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+function run (generator) {
+  const it = generator();
+
+  function go(result) {
+    if (result.done) return result.value;
+
+    return result.value.then(function (value) {
+      return go(it.next(value));
+    }, function (error) {
+      return go(it.throw(error));
+    });
+  }
+
+  go(it.next());
+}
+
+run(g);
+
+上面代码的 Generator 函数g之中，有一个异步操作getFoo，它返回的就是一个Promise对象。函数run用来处理这个Promise对象，并调用下一个next方法。
 
 ```
-
+## 13、Promise.try() 
 ```js
-
-```
-
-```js
-
+实际开发中，经常遇到一种情况：不知道或者不想区分，函数f是同步函数还是异步操作，但是想用 Promise 来处理它。因为这样就可以不管f是否包含异步操作，都用then方法指定下一步流程，用catch方法处理f抛出的错误。一般就会采用下面的写法。
 ```
 
 ```js
