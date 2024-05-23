@@ -558,14 +558,137 @@ function chainAnimationsGenerator(elem, animations) {
   });
 
 }
+
+上面代码使用 Generator 函数遍历了每个动画，语义比 Promise 写法更清晰，用户定义的操作全部都出现在spawn函数的内部。这个写法的问题在于，必须有一个任务运行器，自动执行 Generator 函数，上面代码的spawn函数就是自动执行器，它返回一个 Promise 对象，而且必须保证yield语句后面的表达式，必须返回一个 Promise。
+
+最后是 async 函数的写法。
+async function chainAnimationsAsync(elem, animations) {
+  let ret = null;
+  try {
+    for(let anim of animations) {
+      ret = await anim(elem);
+    }
+  } catch(e) {
+    /* 忽略错误，继续执行 */
+  }
+  return ret;
+}
+
+可以看到 Async 函数的实现最简洁，最符合语义，几乎没有语义不相关的代码。它将 Generator 写法中的自动执行器，改在语言层面提供，不暴露给用户，因此代码量最少。如果使用 Generator 写法，自动执行器需要用户自己提供。
 ```
-
+## 6、实例：按顺序完成异步操作
 ```js
+实际开发中，经常遇到一组异步操作，需要按照顺序完成。比如，依次远程读取一组 URL，然后按照读取的顺序输出结果。
 
+Promise 的写法如下。
+
+function logInOrder(urls) {
+  // 远程读取所有URL
+  const textPromises = urls.map(url => {
+    return fetch(url).then(response => response.text());
+  });
+
+  // 按次序输出
+  textPromises.reduce((chain, textPromise) => {
+    return chain.then(() => textPromise)
+      .then(text => console.log(text));
+  }, Promise.resolve());
+}
+
+上面代码使用fetch方法，同时远程读取一组 URL。每个fetch操作都返回一个 Promise 对象，放入textPromises数组。然后，reduce方法依次处理每个 Promise 对象，然后使用then，将所有 Promise 对象连起来，因此就可以依次输出结果。
+
+这种写法不太直观，可读性比较差。下面是 async 函数实现。
+async function logInOrder(urls) {
+  for (const url of urls) {
+    const response = await fetch(url);
+    console.log(await response.text());
+  }
+}
+
+上面代码确实大大简化，问题是所有远程操作都是继发。只有前一个 URL 返回结果，才会去读取下一个 URL，这样做效率很差，非常浪费时间。我们需要的是并发发出远程请求。
+
+async function logInOrder(urls) {
+  // 并发读取远程URL
+  const textPromises = urls.map(async url => {
+    const response = await fetch(url);
+    return response.text();
+  });
+
+  // 按次序输出
+  for (const textPromise of textPromises) {
+    console.log(await textPromise);
+  }
+}
+
+上面代码中，虽然map方法的参数是async函数，但它是并发执行的，因为只有async函数内部是继发执行，外部不受影响。后面的for..of循环内部使用了await，因此实现了按顺序输出。
 ```
-
+## 7、顶层 await
 ```js
+早期的语法规定是，await命令只能出现在 async 函数内部，否则都会报错。
+// 报错
+const data = await fetch('https://api.example.com');
 
+上面代码中，await命令独立使用，没有放在 async 函数里面，就会报错。
+
+从 ES2022 开始，允许在模块的顶层独立使用await命令，使得上面那行代码不会报错了。它的主要目的是使用await解决模块异步加载的问题。
+
+// awaiting.js
+let output;
+async function main() {
+  const dynamic = await import(someMission);
+  const data = await fetch(url);
+  output = someProcess(dynamic.default, data);
+}
+main();
+export { output };
+
+上面代码中，模块awaiting.js的输出值output，取决于异步操作。我们把异步操作包装在一个 async 函数里面，然后调用这个函数，只有等里面的异步操作都执行，变量output才会有值，否则就返回undefined。
+
+下面是加载这个模块的写法。
+// usage.js
+import { output } from "./awaiting.js";
+
+function outputPlusValue(value) { return output + value }
+
+console.log(outputPlusValue(100));
+setTimeout(() => console.log(outputPlusValue(100)), 1000);
+
+上面代码中，outputPlusValue()的执行结果，完全取决于执行的时间。如果awaiting.js里面的异步操作没执行完，加载进来的output的值就是undefined。
+
+目前的解决方法，就是让原始模块输出一个 Promise 对象，从这个 Promise 对象判断异步操作有没有结束。
+
+// awaiting.js
+let output;
+export default (async function main() {
+  const dynamic = await import(someMission);
+  const data = await fetch(url);
+  output = someProcess(dynamic.default, data);
+})();
+export { output };
+上面代码中，awaiting.js除了输出output，还默认输出一个 Promise 对象（async 函数立即执行后，返回一个 Promise 对象），从这个对象判断异步操作是否结束。
+
+下面是加载这个模块的新的写法。
+
+// usage.js
+import promise, { output } from "./awaiting.js";
+
+function outputPlusValue(value) { return output + value }
+
+promise.then(() => {
+  console.log(outputPlusValue(100));
+  setTimeout(() => console.log(outputPlusValue(100)), 1000);
+});
+
+上面代码中，将awaiting.js对象的输出，放在promise.then()里面，这样就能保证异步操作完成以后，才去读取output。
+
+这种写法比较麻烦，等于要求模块的使用者遵守一个额外的使用协议，按照特殊的方法使用这个模块。一旦你忘了要用 Promise 加载，只使用正常的加载方法，依赖这个模块的代码就可能出错。而且，如果上面的usage.js又有对外的输出，等于这个依赖链的所有模块都要使用 Promise 加载。
+
+顶层的await命令，就是为了解决这个问题。它保证只有异步操作完成，模块才会输出值
+
+// awaiting.js
+const dynamic = import(someMission);
+const data = fetch(url);
+export const output = someProcess((await dynamic).default, await data);
 ```
 
 ```js

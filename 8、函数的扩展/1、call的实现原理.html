@@ -133,6 +133,39 @@
         // fn1 end
         // fn3
         // fn3 end
+
+        async function asyncFunction() {
+            let promise = new Promise((resolve, reject) => {
+                console.log('执行前')
+                setTimeout(() => { console.log('执行了'); resolve("完成") }, 1000)
+            });
+            console.log(1)
+            let result = await promise; // 等待，直到promise解决 (resolve)
+            console.log(2)
+            let a = await 1
+            console.log(a)
+            console.log(result); // "完成"
+        }
+        console.log("开始")
+        asyncFunction();
+        console.log("结束")
+
+        function log(time) {      // 普通的异步函数
+            setTimeout(function () {
+                console.log(time);
+            }, time)
+        }
+        async function fun() {
+            let a = await log(1000); // 按照异步函数的处理事件快慢决定打印殊勋
+            let b = await log(3000);
+            let c = log(2000);
+            console.log(a, b, c);  // 先执行它，上面是三个都是异步，所以开始abc都是undefined
+        }
+        console.log("开始")
+        fun();
+        console.log("结束")
+
+
     </script>
 </body>
 

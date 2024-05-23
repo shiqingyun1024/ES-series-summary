@@ -748,6 +748,7 @@ Promise.any([rejected, alsoRejected]).catch(function (results) {
   console.log(results.errors); // [-1, Infinity]
 });
 ```
+## 10、Promise.resolve()
 
 ```js
 

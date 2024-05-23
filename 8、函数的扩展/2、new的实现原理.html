@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>new 的实现原理</title>
+</head>
+
+<body>
+    <script>
+        function realizeNew(constr, ...args) {
+            if (typeof constr != 'function') {
+                throw new TypeError('not function')
+            }
+            let obj = Object.create(constr.prototype)
+            // 等同于下面的代码
+            // let obj = {}
+            // obj.__proto__ = constr.prototype
+
+            // let args = [...arguments].slice(1) // 如果在所在的函数中直接传args，就不用写这一行了。
+            let result = constr.call(obj, ...args);
+            if (typeof result == 'object') {
+                return result
+            } else {
+                return obj
+            }
+        }
+    </script>
+</body>
+
+</html>
