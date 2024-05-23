@@ -236,13 +236,98 @@ var p2 = new Point(3,2);
 
 p1.__proto__ === p2.__proto__
 //true
+
+上面代码中，p1和p2都是Point的实例，它们的原型都是Point.prototype，所以__proto__属性是相等的。
+
+这也意味着，可以通过实例的__proto__属性为“类”添加方法。
+
+__proto__ 并不是语言本身的特性，这是各大厂商具体实现时添加的私有属性，虽然目前很多现代浏览器的 JS 引擎中都提供了这个私有属性，但依旧不建议在生产中使用该属性，避免对环境产生依赖。生产环境中，我们可以使用 Object.getPrototypeOf() 方法来获取实例对象的原型，然后再来为原型添加方法/属性。
+
+var p1 = new Point(2,3);
+var p2 = new Point(3,2);
+
+p1.__proto__.printName = function () { return 'Oops' };
+
+p1.printName() // "Oops"
+p2.printName() // "Oops"
+
+var p3 = new Point(4,2);
+p3.printName() // "Oops"
+
+上面代码在p1的原型上添加了一个printName()方法，由于p1的原型就是p2的原型，因此p2也可以调用这个方法。而且，此后新建的实例p3也可以调用这个方法。这意味着，使用实例的__proto__属性改写原型，必须相当谨慎，不推荐使用，因为这会改变“类”的原始定义，影响到所有实例。
 ```
-
+## 4、实例属性的新写法
 ```js
+ES2022 为类的实例属性，又规定了一种新写法。实例属性现在除了可以定义在constructor()方法里面的this上面，也可以定义在类内部的最顶层。
+
+// 原来的写法
+class IncreasingCounter {
+  constructor() {
+    this._count = 0;
+  }
+  get value() {
+    console.log('Getting the current value!');
+    return this._count;
+  }
+  increment() {
+    this._count++;
+  }
+}
+
+上面示例中，实例属性_count定义在constructor()方法里面的this上面。
+
+现在的新写法是，这个属性也可以定义在类的最顶层，其他都不变。
+class IncreasingCounter {
+  _count = 0;
+  get value() {
+    console.log('Getting the current value!');
+    return this._count;
+  }
+  increment() {
+    this._count++;
+  }
+}
+上面代码中，实例属性_count与取值函数value()和increment()方法，处于同一个层级。这时，不需要在实例属性前面加上this。
+注意，新写法定义的属性是实例对象自身的属性，而不是定义在实例对象的原型上面。
+这种新写法的好处是，所有实例对象自身的属性都定义在类的头部，看上去比较整齐，一眼就能看出这个类有哪些实例属性。
+class foo {
+  bar = 'hello';
+  baz = 'world';
+
+  constructor() {
+    // ...
+  }
+}
+上面的代码，一眼就能看出，foo类有两个实例属性，一目了然。另外，写起来也比较简洁。
 
 ```
-
+## 5、取值函数（getter）和存值函数（setter）
 ```js
+与 ES5 一样，在“类”的内部可以使用get和set关键字，对某个属性设置存值函数和取值函数，拦截该属性的存取行为。
+
+class MyClass {
+  constructor() {
+    // ...
+  }
+  get prop() {
+    return 'getter';
+  }
+  set prop(value) {
+    console.log('setter: '+value);
+  }
+}
+
+let inst = new MyClass();
+
+inst.prop = 123;
+// setter: 123
+
+inst.prop
+// 'getter'
+
+上面代码中，prop属性有对应的存值函数和取值函数，因此赋值和读取行为都被自定义了。
+
+存值函数和取值函数是设置在属性的 Descriptor 对象上的。
 
 ```
 
