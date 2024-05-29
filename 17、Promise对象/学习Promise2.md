@@ -193,7 +193,7 @@ new Promise((resolve, reject) => {
   console.log(2);
 })
 ```
-
+## Promise.prototype.then()
 
 ```js
 
