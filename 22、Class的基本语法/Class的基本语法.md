@@ -17,6 +17,7 @@
 
 ```js
 JavaScript 语言中，生成实例对象的传统方法是通过构造函数。下面是一个例子。
+
 function Point(x, y) {
   this.x = x;
   this.y = y;
@@ -27,7 +28,6 @@ Point.prototype.toString = function () {
 };
 
 var p = new Point(1, 2);
-
 上面这种写法跟传统的面向对象语言（比如 C++ 和 Java）差异很大，很容易让新学习这门语言的程序员感到困惑。
 
 ES6 提供了更接近传统语言的写法，引入了 Class（类）这个概念，作为对象的模板。通过class关键字，可以定义类。
@@ -50,7 +50,6 @@ class Point {
 Point类除了构造方法，还定义了一个toString()方法。注意，定义toString()方法的时候，前面不需要加上function这个关键字，直接把函数定义放进去了就可以了。另外，方法与方法之间不需要逗号分隔，加了会报错。
 
 ES6 的类，完全可以看作构造函数的另一种写法。
-
 class Point {
   // ...
 }
@@ -71,6 +70,7 @@ const b = new Bar();
 b.doStuff() // "stuff"
 
 构造函数的prototype属性，在 ES6 的“类”上面继续存在。事实上，类的所有方法都定义在类的prototype属性上面。
+
 class Point {
   constructor() {
     // ...
@@ -105,7 +105,6 @@ b.constructor === B.prototype.constructor // true
 上面代码中，b是B类的实例，它的constructor()方法就是B类原型的constructor()方法。
 
 由于类的方法都定义在prototype对象上面，所以类的新方法可以添加在prototype对象上面。Object.assign()方法可以很方便地一次向类添加多个方法。
-
 class Point {
   constructor(){
     // ...
@@ -116,11 +115,11 @@ Object.assign(Point.prototype, {
   toString(){},
   toValue(){}
 });
-
 prototype对象的constructor属性，直接指向“类”的本身，这与 ES5 的行为是一致的。
-Point.prototype.constructor === Point // true
-另外，类的内部所有定义的方法，都是不可枚举的（non-enumerable）。
 
+Point.prototype.constructor === Point // true
+
+另外，类的内部所有定义的方法，都是不可枚举的（non-enumerable）。
 class Point {
   constructor(x, y) {
     // ...
@@ -135,8 +134,6 @@ Object.keys(Point.prototype)
 // []
 Object.getOwnPropertyNames(Point.prototype)
 // ["constructor","toString"]
-
-
 上面代码中，toString()方法是Point类内部定义的方法，它是不可枚举的。这一点与 ES5 的行为不一致。
 
 var Point = function (x, y) {
@@ -151,8 +148,8 @@ Object.keys(Point.prototype)
 // ["toString"]
 Object.getOwnPropertyNames(Point.prototype)
 // ["constructor","toString"]
-
 上面代码采用 ES5 的写法，toString()方法就是可枚举的。
+
 ```
 ## 2、constructor() 方法
 ```js
@@ -182,7 +179,6 @@ new Foo() instanceof Foo
 上面代码中，constructor()函数返回一个全新的对象，结果导致实例对象不是Foo类的实例。
 
 类必须使用new调用，否则会报错。这是它跟普通构造函数的一个主要区别，后者不用new也可以执行。
-
 class Foo {
   constructor() {
     return Object.create(null);
@@ -191,190 +187,6 @@ class Foo {
 
 Foo()
 // TypeError: Class constructor Foo cannot be invoked without 'new'
-```
-## 3、类的实例
-```js
-生成类的实例的写法，与 ES5 完全一样，也是使用new命令。前面说过，如果忘记加上new，像函数那样调用Class()，将会报错。
-
-class Point {
-  // ...
-}
-
-// 报错
-var point = Point(2, 3);
-
-// 正确
-var point = new Point(2, 3);
-
-类的属性和方法，除非显式定义在其本身（即定义在this对象上），否则都是定义在原型上（即定义在class上）。
-
-class Point {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-  }
-
-  toString() {
-    return '(' + this.x + ', ' + this.y + ')';
-  }
-}
-
-var point = new Point(2, 3);
-
-point.toString() // (2, 3)
-
-point.hasOwnProperty('x') // true
-point.hasOwnProperty('y') // true
-point.hasOwnProperty('toString') // false
-point.__proto__.hasOwnProperty('toString') // true
-
-上面代码中，x和y都是实例对象point自身的属性（因为定义在this对象上），所以hasOwnProperty()方法返回true，而toString()是原型对象的属性（因为定义在Point类上），所以hasOwnProperty()方法返回false。这些都与 ES5 的行为保持一致。
-
-与 ES5 一样，类的所有实例共享一个原型对象。
-var p1 = new Point(2,3);
-var p2 = new Point(3,2);
-
-p1.__proto__ === p2.__proto__
-//true
-
-上面代码中，p1和p2都是Point的实例，它们的原型都是Point.prototype，所以__proto__属性是相等的。
-
-这也意味着，可以通过实例的__proto__属性为“类”添加方法。
-
-__proto__ 并不是语言本身的特性，这是各大厂商具体实现时添加的私有属性，虽然目前很多现代浏览器的 JS 引擎中都提供了这个私有属性，但依旧不建议在生产中使用该属性，避免对环境产生依赖。生产环境中，我们可以使用 Object.getPrototypeOf() 方法来获取实例对象的原型，然后再来为原型添加方法/属性。
-
-var p1 = new Point(2,3);
-var p2 = new Point(3,2);
-
-p1.__proto__.printName = function () { return 'Oops' };
-
-p1.printName() // "Oops"
-p2.printName() // "Oops"
-
-var p3 = new Point(4,2);
-p3.printName() // "Oops"
-
-上面代码在p1的原型上添加了一个printName()方法，由于p1的原型就是p2的原型，因此p2也可以调用这个方法。而且，此后新建的实例p3也可以调用这个方法。这意味着，使用实例的__proto__属性改写原型，必须相当谨慎，不推荐使用，因为这会改变“类”的原始定义，影响到所有实例。
-```
-## 4、实例属性的新写法
-```js
-ES2022 为类的实例属性，又规定了一种新写法。实例属性现在除了可以定义在constructor()方法里面的this上面，也可以定义在类内部的最顶层。
-
-// 原来的写法
-class IncreasingCounter {
-  constructor() {
-    this._count = 0;
-  }
-  get value() {
-    console.log('Getting the current value!');
-    return this._count;
-  }
-  increment() {
-    this._count++;
-  }
-}
-
-上面示例中，实例属性_count定义在constructor()方法里面的this上面。
-
-现在的新写法是，这个属性也可以定义在类的最顶层，其他都不变。
-class IncreasingCounter {
-  _count = 0;
-  get value() {
-    console.log('Getting the current value!');
-    return this._count;
-  }
-  increment() {
-    this._count++;
-  }
-}
-上面代码中，实例属性_count与取值函数value()和increment()方法，处于同一个层级。这时，不需要在实例属性前面加上this。
-注意，新写法定义的属性是实例对象自身的属性，而不是定义在实例对象的原型上面。
-这种新写法的好处是，所有实例对象自身的属性都定义在类的头部，看上去比较整齐，一眼就能看出这个类有哪些实例属性。
-class foo {
-  bar = 'hello';
-  baz = 'world';
-
-  constructor() {
-    // ...
-  }
-}
-上面的代码，一眼就能看出，foo类有两个实例属性，一目了然。另外，写起来也比较简洁。
-
-```
-## 5、取值函数（getter）和存值函数（setter）
-```js
-与 ES5 一样，在“类”的内部可以使用get和set关键字，对某个属性设置存值函数和取值函数，拦截该属性的存取行为。
-
-class MyClass {
-  constructor() {
-    // ...
-  }
-  get prop() {
-    return 'getter';
-  }
-  set prop(value) {
-    console.log('setter: '+value);
-  }
-}
-
-let inst = new MyClass();
-
-inst.prop = 123;
-// setter: 123
-
-inst.prop
-// 'getter'
-
-上面代码中，prop属性有对应的存值函数和取值函数，因此赋值和读取行为都被自定义了。
-
-存值函数和取值函数是设置在属性的 Descriptor 对象上的。
-class CustomHTMLElement {
-  constructor(element) {
-    this.element = element;
-  }
-
-  get html() {
-    return this.element.innerHTML;
-  }
-
-  set html(value) {
-    this.element.innerHTML = value;
-  }
-}
-
-var descriptor = Object.getOwnPropertyDescriptor(
-  CustomHTMLElement.prototype, "html"
-);
-
-"get" in descriptor  // true
-"set" in descriptor  // true
-
-上面代码中，存值函数和取值函数是定义在html属性的描述对象上面，这与 ES5 完全一致。
-```
-## 6、属性表达式
-```js
-类的属性名，可以采用表达式。
-
-let methodName = 'getArea';
-
-class Square {
-  constructor(length) {
-    // ...
-  }
-
-  [methodName]() {
-    // ...
-  }
-}
-上面代码中，Square类的方法名getArea，是从表达式得到的。
-```
-
-```js
-
-```
-
-```js
-
 ```
 
 ```js
