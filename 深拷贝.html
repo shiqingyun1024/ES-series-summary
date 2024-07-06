@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // 深拷贝 基础版本
+        function deepClone(target) {
+            // 先判断是否为一个对象，如果是，就进行对象的处理流程
+            if (typeof target === 'object') {
+                let cloneTarget = {};
+                // 对属性进行循环遍历
+                for (const key in target) {
+                    // 递归调用
+                    cloneTarget[key] = deepClone(target[key])
+                }
+                return cloneTarget
+            } else {
+                return target
+            }
+        }
+        // 深拷贝 优化版本
+        function deepClone2(obj, hash = new WeakMap()) {
+            if (obj === null) return null;
+            if (typeof obj !== "object") return obj;
+            if (obj instanceof Date) return new Date(obj);
+            if (obj instanceof RegExp) return new RegExp(obj);
+            // 检查哈希表中是否存在拷贝过的对象，处理循环引用
+            if (hash.has(obj)) return hash.get(obj);
+
+            let cloneObj = new obj.constructor();
+            hash.set(obj, cloneObj);
+
+            for (let key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    cloneObj[key] = deepClone(obj[key], hash)
+                }
+            }
+            return cloneObj;
+        }
+        // 深拷贝 最终版本
+        /**
+         * 
+         * @param {被克隆的对象} obj
+         * @param {避免循环引用} hash
+         * */
+        function deepClone3(obj, hash = new WeakMap()) {
+            // 处理边界值
+            // null undefined 和非对象的情况
+            if (object === null || typeof obj !== 'object') {
+                return obj
+            }
+            // 对日期的克隆
+            if (obj instanceof Date) {
+                return new Date(obj)
+            }
+            // 对正则的克隆
+            if (obj instanceof RegExp) {
+                return new RegExp(obj)
+            }
+            // 避免循环引用
+            if (hash.has(obj)) {
+                return hash.get(obj)
+            }
+            // 获取属性值
+            let allDes = Object.getOwnPropertyDescriptors(obj);
+            // 创建一个新对象，并且继承传入对象的原型链
+            let cloneObj = Object.create(Object.getPrototypeOf(obj), allDes)
+
+            // 处理循环引用
+            hash.set(obj, cloneObj)
+            // 使用递归处理,递归克隆每个键对应的值
+            for (let key of Reflect.ownKeys(obj)) {
+                cloneObj[key] = deepClone(obj[key], hash)
+            }
+            return cloneObj
+        }
+
+        const object1 = {};
+        const a = Symbol('a');
+        const b = Symbol('b');
+
+        object1[a] = 'localSymbol';
+        object1[b] = 'globalSymbol';
+
+        const objectSymbols = Object.getOwnPropertyDescriptors(object1);
+
+        console.log(objectSymbols, objectSymbols[a]);
+    </script>
+</body>
+
+</html>

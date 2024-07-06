@@ -581,45 +581,403 @@ Promise.all([p1, p2])
 // Error: 报错了
 
 ```
-
+## 7、promise.race()
 
 ```js
+Promise.race()方法同样是将多个 Promise 实例，包装成一个新的 Promise 实例。
+
+const p = Promise.race([p1, p2, p3]);
+上面代码中，只要p1、p2、p3之中有一个实例率先改变状态，p的状态就跟着改变。那个率先改变的 Promise 实例的返回值，就传递给p的回调函数。
+
+Promise.race()方法的参数与Promise.all()方法一样，如果不是 Promise 实例，就会先调用下面讲到的Promise.resolve()方法，将参数转为 Promise 实例，再进一步处理。
+
+下面是一个例子，如果指定时间内没有获得结果，就将 Promise 的状态变为reject，否则变为resolve。
+
+const p = Promise.race([
+  fetch('/resource-that-may-take-a-while'),
+  new Promise(function (resolve, reject) {
+    setTimeout(() => reject(new Error('request timeout')), 5000)
+  })
+]);
+
+p
+.then(console.log)
+.catch(console.error);
+
+上面代码中，如果 5 秒之内fetch方法无法返回结果，变量p的状态就会变为rejected，从而触发catch方法指定的回调函数。
+```
+## 8、Promise.allSettled()
+
+```js
+有时候，我们希望等到一组异步操作都结束了，不管每一个操作是成功还是失败，再进行下一步操作。但是，现有的 Promise 方法很难实现这个要求。
+
+Promise.all()方法只适合所有异步操作都成功的情况，如果有一个操作失败，就无法满足要求。
+
+const urls = [url_1, url_2, url_3];
+const requests = urls.map(x => fetch(x));
+
+try {
+  await Promise.all(requests);
+  console.log('所有请求都成功。');
+} catch {
+  console.log('至少一个请求失败，其他请求可能还没结束。');
+}
+
+上面示例中，Promise.all()可以确定所有请求都成功了，但是只要有一个请求失败，它就会报错，而不管另外的请求是否结束。
+
+为了解决这个问题，ES2020 引入了Promise.allSettled()方法，用来确定一组异步操作是否都结束了（不管成功或失败）。所以，它的名字叫做”Settled“，包含了”fulfilled“和”rejected“两种情况。
+
+Promise.allSettled()方法接受一个数组作为参数，数组的每个成员都是一个 Promise 对象，并返回一个新的 Promise 对象。只有等到参数数组的所有 Promise 对象都发生状态变更（不管是fulfilled还是rejected），返回的 Promise 对象才会发生状态变更。
+
+const promises = [
+  fetch('/api-1'),
+  fetch('/api-2'),
+  fetch('/api-3'),
+];
+
+await Promise.allSettled(promises);
+removeLoadingIndicator();
+
+上面示例中，数组promises包含了三个请求，只有等到这三个请求都结束了（不管请求成功还是失败），removeLoadingIndicator()才会执行。
+
+该方法返回的新的 Promise 实例，一旦发生状态变更，状态总是fulfilled，不会变成rejected。状态变成fulfilled后，它的回调函数会接收到一个数组作为参数，该数组的每个成员对应前面数组的每个 Promise 对象。
+
+const resolved = Promise.resolve(42);
+const rejected = Promise.reject(-1);
+
+const allSettledPromise = Promise.allSettled([resolved, rejected]);
+
+allSettledPromise.then(function (results) {
+  console.log(results);
+});
+// [
+//    { status: 'fulfilled', value: 42 },
+//    { status: 'rejected', reason: -1 }
+// ]
+
+上面代码中，Promise.allSettled()的返回值allSettledPromise，状态只可能变成fulfilled。它的回调函数接收到的参数是数组results。该数组的每个成员都是一个对象，对应传入Promise.allSettled()的数组里面的两个 Promise 对象。
+
+results的每个成员是一个对象，对象的格式是固定的，对应异步操作的结果。
+
+// 异步操作成功时
+{status: 'fulfilled', value: value}
+
+// 异步操作失败时
+{status: 'rejected', reason: reason}
+
+成员对象的status属性的值只可能是字符串fulfilled或字符串rejected，用来区分异步操作是成功还是失败。如果是成功（fulfilled），对象会有value属性，如果是失败（rejected），会有reason属性，对应两种状态时前面异步操作的返回值。
+
+下面是返回值的用法例子。
+const promises = [ fetch('index.html'), fetch('https://does-not-exist/') ];
+const results = await Promise.allSettled(promises);
+
+// 过滤出成功的请求
+const successfulPromises = results.filter(p => p.status === 'fulfilled');
+
+// 过滤出失败的请求，并输出原因
+const errors = results
+  .filter(p => p.status === 'rejected')
+  .map(p => p.reason);
+```
+## 9、Promise.any()
+
+```js
+ES2021 引入了Promise.any()方法。该方法接受一组 Promise 实例作为参数，包装成一个新的 Promise 实例返回。
+Promise.any([
+  fetch('https://v8.dev/').then(() => 'home'),
+  fetch('https://v8.dev/blog').then(() => 'blog'),
+  fetch('https://v8.dev/docs').then(() => 'docs')
+]).then((first) => {  // 只要有一个 fetch() 请求成功
+  console.log(first);
+}).catch((error) => { // 所有三个 fetch() 全部请求失败
+  console.log(error);
+});
+
+只要参数实例有一个变成fulfilled状态，包装实例就会变成fulfilled状态；如果所有参数实例都变成rejected状态，包装实例就会变成rejected状态。
+
+下面是Promise()与await命令结合使用的例子。
+const promises = [
+  fetch('/endpoint-a').then(() => 'a'),
+  fetch('/endpoint-b').then(() => 'b'),
+  fetch('/endpoint-c').then(() => 'c'),
+];
+
+try {
+  const first = await Promise.any(promises);
+  console.log(first);
+} catch (error) {
+  console.log(error);
+}
+
+上面代码中，Promise.any()方法的参数数组包含三个 Promise 操作。其中只要有一个变成fulfilled，Promise.any()返回的 Promise 对象就变成fulfilled。如果所有三个操作都变成rejected，那么await命令就会抛出错误。
+
+Promise.any()抛出的错误是一个 AggregateError 实例（详见《对象的扩展》一章），这个 AggregateError 实例对象的errors属性是一个数组，包含了所有成员的错误。
+
+下面是一个例子。
+var resolved = Promise.resolve(42);
+var rejected = Promise.reject(-1);
+var alsoRejected = Promise.reject(Infinity);
+
+Promise.any([resolved, rejected, alsoRejected]).then(function (result) {
+  console.log(result); // 42
+});
+
+Promise.any([rejected, alsoRejected]).catch(function (results) {
+  console.log(results instanceof AggregateError); // true
+  console.log(results.errors); // [-1, Infinity]
+});
+```
+## 10、Promise.resolve()
+
+```js
+有时需要将现有对象转为 Promise 对象，Promise.resolve()方法就起到这个作用。
+const jsPromise = Promise.resolve($.ajax('/whatever.json'));
+上面代码将 jQuery 生成的deferred对象，转为一个新的 Promise 对象。
+Promise.resolve()等价于下面的写法。
+Promise.resolve('foo')
+// 等价于
+new Promise(resolve => resolve('foo'))
+Promise.resolve()方法的参数分成四种情况。
+（1）参数是一个 Promise 实例
+
+如果参数是 Promise 实例，那么Promise.resolve将不做任何修改、原封不动地返回这个实例。
+
+（2）参数是一个thenable对象
+thenable对象指的是具有then方法的对象，比如下面这个对象。
+let thenable = {
+  then: function(resolve, reject) {
+    resolve(42);
+  }
+};
+Promise.resolve()方法会将这个对象转为 Promise 对象，然后就立即执行thenable对象的then()方法。
+
+let thenable = {
+  then: function(resolve, reject) {
+    resolve(42);
+  }
+};
+
+let p1 = Promise.resolve(thenable);
+p1.then(function (value) {
+  console.log(value);  // 42
+});
+
+上面代码中，thenable对象的then()方法执行后，对象p1的状态就变为resolved，从而立即执行最后那个then()方法指定的回调函数，输出42。
+
+（3）参数不是具有then()方法的对象，或根本就不是对象
+如果参数是一个原始值，或者是一个不具有then()方法的对象，则Promise.resolve()方法返回一个新的 Promise 对象，状态为resolved。
+const p = Promise.resolve('Hello');
+
+p.then(function (s) {
+  console.log(s)
+});
+// Hello
+
+上面代码生成一个新的 Promise 对象的实例p。由于字符串Hello不属于异步操作（判断方法是字符串对象不具有 then 方法），返回 Promise 实例的状态从一生成就是resolved，所以回调函数会立即执行。Promise.resolve()方法的参数，会同时传给回调函数。
+
+（4）不带有任何参数
+Promise.resolve()方法允许调用时不带参数，直接返回一个resolved状态的 Promise 对象。
+
+所以，如果希望得到一个 Promise 对象，比较方便的方法就是直接调用Promise.resolve()方法。
+const p = Promise.resolve();
+
+p.then(function () {
+  // ...
+});
+上面代码的变量p就是一个 Promise 对象。
+
+需要注意的是，立即resolve()的 Promise 对象，是在本轮“事件循环”（event loop）的结束时执行，而不是在下一轮“事件循环”的开始时。
+setTimeout(function () {
+  console.log('three');
+}, 0);
+
+Promise.resolve().then(function () {
+  console.log('two');
+});
+
+console.log('one');
+
+// one
+// two
+// three
+
+上面代码中，setTimeout(fn, 0)在下一轮“事件循环”开始时执行，Promise.resolve()在本轮“事件循环”结束时执行，console.log('one')则是立即执行，因此最先输出。
+```
+## 11、Promise.reject()
+
+```js
+Promise.reject(reason)方法也会返回一个新的 Promise 实例，该实例的状态为rejected。
+
+const p = Promise.reject('出错了');
+// 等同于
+const p = new Promise((resolve, reject) => reject('出错了'))
+
+p.then(null, function (s) {
+  console.log(s)
+});
+// 出错了
+
+上面代码生成一个 Promise 对象的实例p，状态为rejected，回调函数会立即执行。
+Promise.reject()方法的参数，会原封不动地作为reject的理由，变成后续方法的参数。
+
+Promise.reject('出错了')
+.catch(e => {
+  console.log(e === '出错了')
+})
+// true
+
+上面代码中，Promise.reject()方法的参数是一个字符串，后面catch()方法的参数e就是这个字符串。
+```
+## 12、应用
+```js
+加载图片
+
+我们可以将图片的加载写成一个Promise，一旦加载完成，Promise的状态就发生变化。
+
+Generator 函数与 Promise 的结合
+使用 Generator 函数管理流程，遇到异步操作的时候，通常返回一个Promise对象。
+
+function getFoo () {
+  return new Promise(function (resolve, reject){
+    resolve('foo');
+  });
+}
+
+const g = function* () {
+  try {
+    const foo = yield getFoo();
+    console.log(foo);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+function run (generator) {
+  const it = generator();
+
+  function go(result) {
+    if (result.done) return result.value;
+
+    return result.value.then(function (value) {
+      return go(it.next(value));
+    }, function (error) {
+      return go(it.throw(error));
+    });
+  }
+
+  go(it.next());
+}
+
+run(g);
+
+上面代码的 Generator 函数g之中，有一个异步操作getFoo，它返回的就是一个Promise对象。函数run用来处理这个Promise对象，并调用下一个next方法。
+```
+## 13、Promise.try()
+```js
+实际开发中，经常遇到一种情况：不知道或者不想区分，函数f是同步函数还是异步操作，但是想用 Promise 来处理它。因为这样就可以不管f是否包含异步操作，都用then方法指定下一步流程，用catch方法处理f抛出的错误。一般就会采用下面的写法。
+
+Promise.resolve().then(f)
+
+上面的写法有一个缺点，就是如果f是同步函数，那么它会在本轮事件循环的末尾执行。
+const f = () => console.log('now');
+Promise.resolve().then(f);
+console.log('next');
+// next
+// now
+上面代码中，函数f是同步的，但是用 Promise 包装了以后，就变成异步执行了。
+
+那么有没有一种方法，让同步函数同步执行，异步函数异步执行，并且让它们具有统一的 API 呢？回答是可以的，并且还有两种写法。第一种写法是用async函数来写。
+
+const f = () => console.log('now');
+(async () => f())();
+console.log('next');
+// now
+// next
+
+上面代码中，第二行是一个立即执行的匿名函数，会立即执行里面的async函数，因此如果f是同步的，就会得到同步的结果；如果f是异步的，就可以用then指定下一步，就像下面的写法。
+
+(async () => f())()
+.then(...)
+
+需要注意的是，async () => f()会吃掉f()抛出的错误。所以，如果想捕获错误，要使用promise.catch方法。
+
+(async () => f())()
+.then(...)
+.catch(...)
+
+第二种写法是使用new Promise()。
+
+const f = () => console.log('now');
+(
+  () => new Promise(
+    console.log(123)
+    resolve => resolve(f())
+  )
+)();
+console.log('next');
+// now
+// next
+
+上面代码也是使用立即执行的匿名函数，执行new Promise()。这种情况下，同步函数也是同步执行的。
+
+鉴于这是一个很常见的需求，所以现在有一个提案，提供Promise.try方法替代上面的写法。
+
+const f = () => console.log('now');
+Promise.try(f);
+console.log('next');
+// now
+// next
+
+事实上，Promise.try存在已久，Promise 库Bluebird、Q和when，早就提供了这个方法。
+由于Promise.try为所有操作提供了统一的处理机制，所以如果想用then方法管理流程，最好都用Promise.try包装一下。这样有许多好处，其中一点就是可以更好地管理异常。
+
+function getUsername(userId) {
+  return database.users.get({id: userId})
+  .then(function(user) {
+    return user.name;
+  });
+}
+上面代码中，database.users.get()返回一个 Promise 对象，如果抛出异步错误，可以用catch方法捕获，就像下面这样写。
+database.users.get({id: userId})
+.then(...)
+.catch(...)
+
+但是database.users.get()可能还会抛出同步错误（比如数据库连接错误，具体要看实现方法），这时你就不得不用try...catch去捕获。
+
+上面这样的写法就很笨拙了，这时就可以统一用promise.catch()捕获所有同步和异步的错误。
+Promise.try(() => database.users.get({id: userId}))
+  .then(...)
+  .catch(...)
+
+  事实上，Promise.try就是模拟try代码块，就像promise.catch模拟的是catch代码块。
 
 ```
-
-
+### Promise.withResolvers()
 ```js
+Promise.withResolvers() 允许创建一个新的 Promise，并同时获得 resolve 和 reject 函数。
 
-```
+Promise.withResolvers() 等同于以下代码，不过代码会更简洁：
 
+let resolve, reject;
+const promise = new Promise((res, rej) => {
+  resolve = res;
+  reject = rej;
+});
 
-```js
+通常，当创建一个新的 Promise 时，会传递一个执行器函数给 Promise 构造函数，这个执行器函数接收两个参数：resolve 和 reject 。但在某些情况下，可能想要在 Promise 创建之后仍然能够访问到这两个函数。这就是 Promise.withResolvers() 的用武之地。
 
-```
+使用 Promise.withResolvers() 的例子：
 
+const { promise, resolve, reject } = Promise.withResolvers();  
+  
+// 在这里可以使用 resolve 和 reject 函数  
+setTimeout(() => resolve('成功！'), 8000);  
+  
+promise.then(value => {  
+  console.log(value); // 输出: 成功！  
+});
 
-```js
-
-```
-
-
-```js
-
-```
-
-
-```js
-
-```
-
-
-```js
-
-```
-
-
-
-```js
+使用 Promise.withResolvers() 关键的区别在于resolve 和 reject函数现在与 Promise 本身处于同一作用域，而不是在执行器中被创建和一次性使用。这可能使得一些更高级的用例成为可能，例如在重复事件中重用它们，特别是在处理流和队列时。这通常也意味着相比在执行器内包装大量逻辑，嵌套会更少。这个方法对于那些需要更细粒度控制 Promise 的状态，或者在 Promise 创建后仍然需要访问 resolve 和 reject 函数的场景来说非常有用。
 
 ```
 
