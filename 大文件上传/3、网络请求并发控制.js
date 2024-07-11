@@ -55,3 +55,49 @@ async uploadChunks(uploadedList = []) {
         await this.mergeRequest();
     }
 }
+
+// 慢启动策略实现
+async handleUpload1(){
+    // @todo数据缩放的比率 可以更平缓  
+    // @todo 并发+慢启动
+
+    // 慢启动上传逻辑 
+    const file = this.container.file
+    if (!file) return;
+    this.status = Status.uploading;
+    const fileSize = file.size
+    let offset = 1024 * 1024
+    let cur = 0
+    let count = 0
+    this.container.hash = await this.calculateHashSample();
+
+    while (cur < fileSize) {
+        // 切割offfset大小
+        const chunk = file.slice(cur, cur + offset)
+        cur += offset
+        const chunkName = this.container.hash + "-" + count;
+        const form = new FormData();
+        form.append("chunk", chunk);
+        form.append("hash", chunkName);
+        form.append("filename", file.name);
+        form.append("fileHash", this.container.hash);
+        form.append("size", chunk.size);
+
+        let start = new Date().getTime()
+        await request({ url: '/upload', data: form })
+        const now = new Date().getTime()
+
+        const time = ((now - start) / 1000).toFixed(4)
+        let rate = time / 30
+        // 速率有最大2和最小0.5
+        if (rate < 0.5) rate = 0.5
+        if (rate > 2) rate = 2
+        // 新的切片大小等比变化
+        console.log(`切片${count}大小是${this.format(offset)},耗时${time}秒，是30秒的${rate}倍，修正大小为${this.format(offset / rate)}`)
+        // 动态调整offset
+        offset = parseInt(offset / rate)
+        // if(time)
+        count++
+    }
+}
+
